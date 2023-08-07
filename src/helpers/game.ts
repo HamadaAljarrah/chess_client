@@ -1,0 +1,125 @@
+import { Square, Color, Index } from "@/model/types";
+import { Bishop } from "@/model/pieces/bishop";
+import { King } from "@/model/pieces/king";
+import { Knight } from "@/model/pieces/knight";
+import { Pawn } from "@/model/pieces/pawn";
+import { Queen } from "@/model/pieces/queen";
+import { Rook } from "@/model/pieces/rook";
+import { Piece } from "@/model/piece";
+
+export const initBoard = (): Square[][] => {
+    const board: Square[][] = [];
+
+    for (let i = 0; i < 8; i++) {
+        const row: Square[] = [];
+
+        for (let j = 0; j < 8; j++) {
+            const color = (i + j) % 2 === 0 ? "white" : "black";
+            row.push({
+                color,
+                piece: null,
+                availibale: false,
+                focus: false,
+                index: { x: i, y: j },
+            });
+        }
+        board.push(row);
+    }
+
+    for (let i = 0; i < 8; i++) {
+        for (let j = 0; j < 8; j++) {
+            switch (i) {
+                case 0:
+                    board[i][0].piece = new Rook("black", { x: i, y: 0 });
+                    board[i][1].piece = new Knight("black", { x: i, y: 1 });
+                    board[i][2].piece = new Bishop("black", { x: i, y: 2 });
+                    board[i][3].piece = new Queen("black", { x: i, y: 3 });
+                    board[i][4].piece = new King("black", { x: i, y: 4 });
+                    board[i][5].piece = new Bishop("black", { x: i, y: 5 });
+                    board[i][6].piece = new Knight("black", { x: i, y: 6 });
+                    board[i][7].piece = new Rook("black", { x: i, y: 7 });
+                    break;
+                case 1:
+                    board[i][j].piece = new Pawn("black", { x: i, y: j });
+                    break;
+
+                case 6:
+                    board[i][j].piece = new Pawn("white", { x: i, y: j });
+                    break;
+
+                case 7:
+                    board[i][0].piece = new Rook("white", { x: i, y: 0 });
+                    board[i][1].piece = new Knight("white", { x: i, y: 1 });
+                    board[i][2].piece = new Bishop("white", { x: i, y: 2 });
+                    board[i][3].piece = new Queen("white", { x: i, y: 3 });
+                    board[i][4].piece = new King("white", { x: i, y: 4 });
+                    board[i][5].piece = new Bishop("white", { x: i, y: 5 });
+                    board[i][6].piece = new Knight("white", { x: i, y: 6 });
+                    board[i][7].piece = new Rook("white", { x: i, y: 7 });
+                    break;
+            }
+        }
+    }
+
+    return board;
+};
+
+export const copyBoard = (board: Square[][]) => {
+    const copy: Square[][] = [];
+
+    for (let i = 0; i < board.length; i++) {
+        copy[i] = [...board[i]];
+    }
+    return copy;
+};
+
+export const getLegalBlocks = (piece: Piece, board: Square[][]): Square[][] => {
+
+    
+    const copy = copyBoard(board);
+    for (let x = 0; x < 8; x++) {
+        for (let y = 0; y < 8; y++) {
+            if (piece.isLegalMove(piece.index, { x, y }, board)) {
+                copy[x][y].availibale = true;
+            }
+        }
+    }
+
+    return copy;
+};
+
+export const removeLegalBlock = (board: Square[][]): Square[][] => {
+    const copy = copyBoard(board);
+
+    for (let x = 0; x < 8; x++) {
+        for (let y = 0; y < 8; y++) {
+            copy[x][y].availibale = false;
+        }
+    }
+    return copy;
+};
+
+export const makeMove = (
+    src: Index,
+    dest: Index,
+    board: Square[][]
+): Square[][] => {
+    const copy: Square[][] = [];
+
+    for (let i = 0; i < board.length; i++) {
+        copy[i] = [...board[i]];
+    }
+
+    const piece = copy[src.x][src.y].piece;
+    if (piece) {
+        piece.index = { x: dest.x, y: dest.y };
+        copy[src.x][src.y].piece = null;
+        copy[dest.x][dest.y].piece = piece;
+    }
+
+    return copy;
+};
+
+export const notChangingPosition = (src: Index, dest: Index): boolean => {
+    return src.x === dest.x && src.y === dest.y;
+};
