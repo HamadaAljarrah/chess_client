@@ -3,11 +3,12 @@ import { useState } from "react"
 
 interface Props {
     block: Square,
+    routate?: boolean;
     onClick: (block:Square) => void,
     src?: string
 }
 
-const Block = ({ onClick, block, src, ...props }: Props) => {
+const Block = ({ onClick, block, src,routate, ...props }: Props) => {
 
     const handleClick = () => {
         onClick(block)
@@ -44,6 +45,16 @@ const Block = ({ onClick, block, src, ...props }: Props) => {
                     inset-0
                     bg-purple-500
                     opacity-50
+                `} />
+            }
+             {
+                block.danger &&
+                <div className={`
+                    absolute
+                    z-0
+                    inset-0
+                    bg-red-500
+                    opacity-90
                 `} />
             }
 

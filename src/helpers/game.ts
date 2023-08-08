@@ -5,7 +5,6 @@ import { Knight } from "@/model/pieces/knight";
 import { Pawn } from "@/model/pieces/pawn";
 import { Queen } from "@/model/pieces/queen";
 import { Rook } from "@/model/pieces/rook";
-import { Piece } from "@/model/piece";
 
 export const initBoard = (): Square[][] => {
     const board: Square[][] = [];
@@ -18,9 +17,10 @@ export const initBoard = (): Square[][] => {
             row.push({
                 color,
                 piece: null,
+                index: { x: i, y: j },
                 availibale: false,
                 focus: false,
-                index: { x: i, y: j },
+                danger: false,
             });
         }
         board.push(row);
@@ -73,32 +73,6 @@ export const copyBoard = (board: Square[][]) => {
     return copy;
 };
 
-export const getLegalBlocks = (piece: Piece, board: Square[][]): Square[][] => {
-
-    
-    const copy = copyBoard(board);
-    for (let x = 0; x < 8; x++) {
-        for (let y = 0; y < 8; y++) {
-            if (piece.isLegalMove(piece.index, { x, y }, board)) {
-                copy[x][y].availibale = true;
-            }
-        }
-    }
-
-    return copy;
-};
-
-export const removeLegalBlock = (board: Square[][]): Square[][] => {
-    const copy = copyBoard(board);
-
-    for (let x = 0; x < 8; x++) {
-        for (let y = 0; y < 8; y++) {
-            copy[x][y].availibale = false;
-        }
-    }
-    return copy;
-};
-
 export const makeMove = (
     src: Index,
     dest: Index,
@@ -123,3 +97,7 @@ export const makeMove = (
 export const notChangingPosition = (src: Index, dest: Index): boolean => {
     return src.x === dest.x && src.y === dest.y;
 };
+
+export const MOVEMENT_SCRIPTS_ROW = ["A", "B", "C", "D", "E", "F", "G", "H"];
+
+export const MOVEMENT_SCRIPTS_COL = ["8", "7", "6", "5", "4", "3", "2", "1"];

@@ -1,21 +1,31 @@
-import {  initBoard } from "@/helpers/game";
+import { initBoard } from "@/helpers/game";
 import { Square } from "@/model/types";
-import {  ReactNode, createContext, useContext, useReducer } from "react";
+import { ReactNode, createContext, useContext, useReducer } from "react";
 import { reducer } from "./reducer";
+
+export type AppActions =
+    | { type: 'MOVE_PIECE', payload: { block: Square } }
+    | { type: 'STATE_BACKWARD' }
+    | { type: 'STATE_FORWARD' }
+
 
 
 export type AppState = {
     board: Square[][],
-    movement: {
-        src: Square | null,
-        dest: Square | null
-    }
+    currentBlock: Square | null,
+    boardBackup: Square[][][],
+    movementScripts: string[],
+    backupIndex: number
 }
 
 
 export interface AppContext {
     state: AppState,
     movePiece: (block: Square) => void
+    forward: () => void
+    backward: () => void
+
+
 
 }
 const appContext = createContext<AppContext | undefined>(undefined);
@@ -23,25 +33,22 @@ const appContext = createContext<AppContext | undefined>(undefined);
 
 export const initialState: AppState = {
     board: initBoard(),
-    movement: {
-        src: null,
-        dest: null
-    }
+    currentBlock: null,
+    boardBackup: [initBoard()],
+    movementScripts: [],
+    backupIndex: 0
 }
 
 const AppContextProvider = ({ children }: { children: ReactNode }) => {
     const [state, dispatch] = useReducer(reducer, initialState);
-    
-    const movePiece = (block: Square) => {
-        dispatch({ type: "MOUSE_CLICK", payload: { block } })
-        dispatch({ type: 'SHOW_LEGAL_MOVES', payload: { block } })
-        dispatch({ type: "MOVE_PIECE" })
-        dispatch({ type: 'REMOVE_LEGAL_MOVES' })
 
-    }
+    const movePiece = (block: Square) => dispatch({ type: "MOVE_PIECE", payload: { block } })
+    const forward = () => dispatch({ type: "STATE_FORWARD" })
+    const backward = () => dispatch({ type: "STATE_BACKWARD" })
+
 
     return (
-        <appContext.Provider value={{ state, movePiece }}>
+        <appContext.Provider value={{ state, movePiece, forward, backward }}>
             {children}
         </appContext.Provider>
     )

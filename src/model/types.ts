@@ -13,4 +13,5 @@ export interface Square {
     index: Index;
     availibale: boolean;
     focus: boolean;
+    danger: boolean
 }

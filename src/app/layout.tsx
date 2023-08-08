@@ -14,7 +14,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body >
-        <section className='max-w-[800px] m-auto'>
+        <section className='max-w-[1000px] m-auto'>
           {children}
         </section>
       </body>
