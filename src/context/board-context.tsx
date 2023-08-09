@@ -13,8 +13,9 @@ export type AppActions =
 export type AppState = {
     board: Square[][],
     currentBlock: Square | null,
-    boardBackup: Square[][][],
     movementScripts: string[],
+
+    boardBackup: Square[][][],
     backupIndex: number
 }
 
@@ -34,8 +35,9 @@ const appContext = createContext<AppContext | undefined>(undefined);
 export const initialState: AppState = {
     board: initBoard(),
     currentBlock: null,
-    boardBackup: [initBoard()],
     movementScripts: [],
+
+    boardBackup: [initBoard()],
     backupIndex: 0
 }
 

@@ -64,33 +64,25 @@ export const initBoard = (): Square[][] => {
     return board;
 };
 
-export const copyBoard = (board: Square[][]) => {
-    const copy: Square[][] = [];
 
-    for (let i = 0; i < board.length; i++) {
-        copy[i] = [...board[i]];
-    }
-    return copy;
-};
 
-export const makeMove = (
-    src: Index,
-    dest: Index,
-    board: Square[][]
-): Square[][] => {
-    const copy: Square[][] = [];
+export function copyBoard(array: Square[][]): Square[][] {
+    return array.map(row => row.map(square => ({...square})));
+}
+export function copyBoardBackup(boardBackup: Square[][][]): Square[][][] {
+    return boardBackup.map(board => copyBoard(board));
+}
 
-    for (let i = 0; i < board.length; i++) {
-        copy[i] = [...board[i]];
-    }
 
+
+export const makeMove = ( src: Index, dest: Index, board: Square[][]): Square[][] => {
+    const copy = copyBoard(board);
     const piece = copy[src.x][src.y].piece;
     if (piece) {
         piece.index = { x: dest.x, y: dest.y };
         copy[src.x][src.y].piece = null;
         copy[dest.x][dest.y].piece = piece;
     }
-
     return copy;
 };
 
@@ -98,6 +90,20 @@ export const notChangingPosition = (src: Index, dest: Index): boolean => {
     return src.x === dest.x && src.y === dest.y;
 };
 
-export const MOVEMENT_SCRIPTS_ROW = ["A", "B", "C", "D", "E", "F", "G", "H"];
 
-export const MOVEMENT_SCRIPTS_COL = ["8", "7", "6", "5", "4", "3", "2", "1"];
+
+const MOVEMENT_SCRIPTS_ROW = ["A", "B", "C", "D", "E", "F", "G", "H"];
+const MOVEMENT_SCRIPTS_COL = ["8", "7", "6", "5", "4", "3", "2", "1"];
+
+export const createScript = (src:Index, dest:Index) => {
+    const script =
+    MOVEMENT_SCRIPTS_COL[src.x] +
+    MOVEMENT_SCRIPTS_ROW[dest.y] +
+    "->" +
+    MOVEMENT_SCRIPTS_COL[dest.x] +
+    MOVEMENT_SCRIPTS_ROW[dest.y];
+
+    return script
+}
+
+
