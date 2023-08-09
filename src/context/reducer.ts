@@ -1,6 +1,4 @@
 import {
-    MOVEMENT_SCRIPTS_COL,
-    MOVEMENT_SCRIPTS_ROW,
     copyBoard,
     copyBoardBackup,
     createScript,
@@ -12,13 +10,20 @@ import { clearUiHelp, showValidBlocks } from "@/helpers/ui";
 export const reducer = (state: AppState, actions: AppActions): AppState => {
     switch (actions.type) {
         case "MOVE_PIECE":
+
+            // Check player turn
+            if(!state.currentBlock && actions.payload.block.piece?.color !== state.currentPlayer){
+                return {...state} 
+            }
+
             const payloadBlock = actions.payload.block;
             const currentBlock = state.currentBlock;
-
+           
             // Ignore empty fields
             if (!payloadBlock.piece && !currentBlock) {
                 return state;
             }
+
 
             // First click
             if (!currentBlock && payloadBlock.piece) {
@@ -34,13 +39,7 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
             // Second click
             if (currentBlock) {
                 // Invalid move
-                if (
-                    !currentBlock.piece?.isLegalMove(
-                        currentBlock.index,
-                        payloadBlock.index,
-                        state.board
-                    )
-                ) {
+                if (!currentBlock.piece?.isLegalMove(currentBlock.index,payloadBlock.index,state.board)) {
                     let updatedBoard = clearUiHelp(state.board);
                     return {
                         ...state,
@@ -49,44 +48,48 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
                     };
                 }
 
-                // Valid move
-                const script = createScript(currentBlock.index,payloadBlock.index) // Create script
-                const updatedScript = [...state.movementScripts, script]; // Update the movement script
-                let updatedBoard = clearUiHelp(state.board); // Clear green and puple squares
-                updatedBoard = makeMove(currentBlock.index, payloadBlock.index, updatedBoard) // Update board
-                const boardBackup = [...copyBoardBackup(state.boardBackup), updatedBoard]; // Update board backup
 
+                // Valid move
+                const script = createScript(currentBlock.index,payloadBlock.index); // Create script
+
+                const movementScripts = [...state.movementScripts, script]; // Update the movement script
+
+                let board = clearUiHelp(state.board); // Clear green and puple squares
+
+                board = makeMove(currentBlock.index,payloadBlock.index,board); // Update board
+
+                const boardBackup = [...copyBoardBackup(state.boardBackup),board,]; // Update board backup
+
+                const currentPlayer = state.currentPlayer === 'white' ? 'black': 'white'; // Switch player
 
                 return {
                     ...state,
-                    board: updatedBoard,
+                    board,
                     boardBackup,
                     currentBlock: null,
                     backupIndex: state.backupIndex + 1,
-                    movementScripts: updatedScript,
+                    movementScripts,
+                    currentPlayer
                 };
             }
 
         case "STATE_BACKWARD":
-            if(state.backupIndex > 0){
-                let movementScripts = [...state.movementScripts].slice(0, -1);
-                const backupIndex = state.backupIndex - 1;
-    
-                console.log(state.boardBackup);
-    
-                const board = copyBoard(state.boardBackup[backupIndex]);
-                const boardBackup = [...state.boardBackup].slice(0, -1);
-    
+            if (state.backupIndex > 0) {
+                let movementScripts = [...state.movementScripts].slice(0, -1); // Remove last script
+                const backupIndex = state.backupIndex - 1; // Update histroy index
+                const board = copyBoard(state.boardBackup[backupIndex]); // Get the right board
+                const boardBackup = [...state.boardBackup].slice(0, -1); // Remove last board from backup
+                const currentPlayer = state.currentPlayer === 'white' ? 'black': 'white'; // Switch player
                 return {
                     ...state,
                     movementScripts,
                     board,
                     boardBackup,
                     backupIndex,
+                    currentPlayer
                 };
             }
-            return {...state}
-           
+            return { ...state };
 
         default:
             return { ...state };

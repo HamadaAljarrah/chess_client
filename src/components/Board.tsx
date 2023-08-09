@@ -17,7 +17,7 @@ const Board = () => {
 
 
     return (
-        <div className="grid grid-cols-8 grid-rows-8 w-[800px] h-[800px] border-slate-800 border-[1px]">
+        <div className="grid grid-cols-8 grid-rows-8 w-[800px] h-[800px] border-slate-800 border-[2px] box-content">
             {state.board.map((row, rowIdx) => {
                 let char = "@"
                 return row.map((col, colIdx) => {

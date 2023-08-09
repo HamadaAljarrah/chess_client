@@ -1,5 +1,5 @@
 import { initBoard } from "@/helpers/game";
-import { Square } from "@/model/types";
+import { Color, Square } from "@/model/types";
 import { ReactNode, createContext, useContext, useReducer } from "react";
 import { reducer } from "./reducer";
 
@@ -17,6 +17,7 @@ export type AppState = {
 
     boardBackup: Square[][][],
     backupIndex: number
+    currentPlayer: Color
 }
 
 
@@ -38,7 +39,8 @@ export const initialState: AppState = {
     movementScripts: [],
 
     boardBackup: [initBoard()],
-    backupIndex: 0
+    backupIndex: 0,
+    currentPlayer: 'white'
 }
 
 const AppContextProvider = ({ children }: { children: ReactNode }) => {

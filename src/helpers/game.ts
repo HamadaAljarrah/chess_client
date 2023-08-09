@@ -80,8 +80,8 @@ export const makeMove = ( src: Index, dest: Index, board: Square[][]): Square[][
     const piece = copy[src.x][src.y].piece;
     if (piece) {
         piece.index = { x: dest.x, y: dest.y };
-        copy[src.x][src.y].piece = null;
         copy[dest.x][dest.y].piece = piece;
+        copy[src.x][src.y].piece = null;
     }
     return copy;
 };
