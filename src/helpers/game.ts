@@ -79,8 +79,9 @@ export const makeMove = ( src: Index, dest: Index, board: Square[][]): Square[][
     const copy = copyBoard(board);
     const piece = copy[src.x][src.y].piece;
     if (piece) {
-        piece.index = { x: dest.x, y: dest.y };
-        copy[dest.x][dest.y].piece = piece;
+        const newPiece = piece.clone();
+        newPiece.index = { x: dest.x, y: dest.y };
+        copy[dest.x][dest.y].piece = newPiece;
         copy[src.x][src.y].piece = null;
     }
     return copy;

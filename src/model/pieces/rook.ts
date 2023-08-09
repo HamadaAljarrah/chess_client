@@ -10,4 +10,8 @@ export class Rook extends Piece {
                 : "./pieces/WHITE_ROOK.png";
         super(rookMovement, color, image,index);
     }
+
+    clone(): Rook {
+        return new Rook(this.color, this.index)
+    }
 }

@@ -10,4 +10,9 @@ export class King extends Piece {
                 : "./pieces/WHITE_KING.png";
         super(kingMovement, color, image,index);
     }
+
+    clone(): King {
+        return new King(this.color, this.index)
+    
+    }
 }

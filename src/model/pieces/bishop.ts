@@ -10,4 +10,8 @@ export class Bishop extends Piece {
                 : "./pieces/WHITE_BISHOP.png";
         super(bishopMovement, color, image, index);
     }
+
+    clone(): Bishop {
+        return new Bishop(this.color, this.index)
+    }  
 }

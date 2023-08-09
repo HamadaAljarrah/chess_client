@@ -10,4 +10,9 @@ export class Knight extends Piece {
                 : "./pieces/WHITE_KNIGHT.png";
         super(knightMovement, color, image, index);
     }
+
+    clone(): Knight {
+        return new Knight(this.color, this.index)
+        
+    }
 }

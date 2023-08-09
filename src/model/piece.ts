@@ -33,4 +33,6 @@ export abstract class Piece {
         }
         return this.moveStrategy.canMove(src, dest, board);
     }
+
+    abstract clone(): Piece;
 }

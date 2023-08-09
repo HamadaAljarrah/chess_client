@@ -10,4 +10,9 @@ export class Pawn extends Piece {
                 : "./pieces/WHITE_PAWN.png";
         super(pawnMovement, color, image,index);
     }
+
+    clone(): Pawn {
+        return new Pawn(this.color, this.index)
+        
+    }
 }

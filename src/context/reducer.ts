@@ -21,7 +21,7 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
            
             // Ignore empty fields
             if (!payloadBlock.piece && !currentBlock) {
-                return state;
+                return {...state};
             }
 
 
@@ -54,13 +54,15 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
 
                 const movementScripts = [...state.movementScripts, script]; // Update the movement script
 
-                let board = clearUiHelp(state.board); // Clear green and puple squares
+                let board = clearUiHelp(state.board); // Clear green and purple squares and deep copy board
 
                 board = makeMove(currentBlock.index,payloadBlock.index,board); // Update board
 
-                const boardBackup = [...copyBoardBackup(state.boardBackup),board,]; // Update board backup
+                const boardBackup = [...copyBoardBackup(state.boardBackup), board]; // Update board backup
 
                 const currentPlayer = state.currentPlayer === 'white' ? 'black': 'white'; // Switch player
+
+                
 
                 return {
                     ...state,
@@ -77,8 +79,8 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
             if (state.backupIndex > 0) {
                 let movementScripts = [...state.movementScripts].slice(0, -1); // Remove last script
                 const backupIndex = state.backupIndex - 1; // Update histroy index
+                const boardBackup = copyBoardBackup(state.boardBackup).slice(0, -1); // Remove last board from backup
                 const board = copyBoard(state.boardBackup[backupIndex]); // Get the right board
-                const boardBackup = [...state.boardBackup].slice(0, -1); // Remove last board from backup
                 const currentPlayer = state.currentPlayer === 'white' ? 'black': 'white'; // Switch player
                 return {
                     ...state,
@@ -86,6 +88,7 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
                     board,
                     boardBackup,
                     backupIndex,
+                    currentBlock: null,
                     currentPlayer
                 };
             }

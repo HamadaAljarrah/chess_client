@@ -7,6 +7,7 @@ import { nextChar } from '@/helpers/ui'
 
 const Board = () => {
     const { state, movePiece } = useAppContext()
+
     const handleClick = (block: Square) => {
         movePiece(block)
     }
