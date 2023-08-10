@@ -3,7 +3,6 @@ import {
     copyBoard,
     copyBoardBackup,
     createScript,
-    getPiecesIndex,
     isCastlingMove,
     makeMove,
 } from "@/helpers/game";

@@ -21,8 +21,8 @@ export const kingMovement: IMoveStrategy = {
             (dx === 0 && dy === 1) ||
             (dx === 1 && dy === 1)
         ) {
-            const destBlock = board[dest.x][dest.y];
-            const srcBlock = board[src.x][src.y];
+            const destBlock = board[dest.y][dest.x];
+            const srcBlock = board[src.y][src.x];
 
             // Same color piece check
             if (

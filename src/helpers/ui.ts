@@ -8,23 +8,24 @@ export const showValidBlocks = (
     board: Square[][]
 ): Square[][] => {
     const copy = copyBoard(board);
-    for (let x = 0; x < 8; x++) {
-        for (let y = 0; y < 8; y++) {
+    for (let y = 0; y < 8; y++) {
+        for (let x = 0; x < 8; x++) {
             if (piece.isLegalMove(piece.index, { x, y }, board)) {
                 if (
-                    board[x][y].piece &&
-                    board[x][y].piece?.color !== piece.color
+                    board[y][x].piece &&
+                    board[y][x].piece?.color !== piece.color
                 ) {
-                    copy[x][y].danger = true;
+                    copy[y][x].danger = true;
                 } else {
-                    copy[x][y].availibale = true;
+                    copy[y][x].availibale = true;
                 }
             }
+
             if (x === piece.index.x && y === piece.index.y) {
-                copy[x][y].focus = true;
+                copy[y][x].focus = true;
             }
             if(isCastlingMove(piece.index, {x,y}, piece.color, board)){
-                copy[x][y].availibale = true;
+                copy[y][x].availibale = true;
             }
 
         }
@@ -36,11 +37,11 @@ export const showValidBlocks = (
 export const clearUiHelp = (board: Square[][]): Square[][] => {
     const copy = copyBoard(board);
 
-    for (let x = 0; x < 8; x++) {
-        for (let y = 0; y < 8; y++) {
-            copy[x][y].availibale = false;
-            copy[x][y].focus = false;
-            copy[x][y].danger = false;
+    for (let y = 0; y < 8; y++) {
+        for (let x = 0; x < 8; x++) {
+            copy[y][x].availibale = false;
+            copy[y][x].focus = false;
+            copy[y][x].danger = false;
         }
     }
     return copy;

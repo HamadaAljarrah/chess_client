@@ -17,15 +17,15 @@ export const bishopMovement: IMoveStrategy = {
 
         while (x !== dest.x && y !== dest.y) {
             
-            if (board[x][y].piece !== null) {
+            if (board[y][x].piece !== null) {
                 return false; // Collision detected
             }
             x += dx;
             y += dy;
         }
 
-        const destBlock = board[dest.x][dest.y];
-        const srcBlock = board[src.x][src.y];
+        const destBlock = board[dest.y][dest.x];
+        const srcBlock = board[src.y][src.x];
 
         if (destBlock.piece !== null && destBlock.piece.color === srcBlock.piece?.color) {
             return false; // Cannot capture a piece of the same color

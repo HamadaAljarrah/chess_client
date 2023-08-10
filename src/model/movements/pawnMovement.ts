@@ -9,25 +9,25 @@ export const pawnMovement: IMoveStrategy = {
         const dx = src.x - dest.x;
         const dy = src.y - dest.y;
 
-        const srcBlock = board[src.x][src.y];
-        const destBlock = board[dest.x][dest.y];
+        const srcBlock = board[src.y][src.x];
+        const destBlock = board[dest.y][dest.x];
 
     
         if (srcBlock.piece?.color === 'white') {
             // White pawn moves upwards
 
             // Moving one square forward
-            if (dx === 1 && dy === 0 && board[dest.x][dest.y].piece === null) {
+            if (dy === 1 && dx === 0 && board[dest.y][dest.x].piece === null) {
                 return true;
             }
 
             // Capturing diagonally
-            if (dx === 1 && Math.abs(dy) === 1 && board[dest.x][dest.y].piece !== null && destBlock.piece?.color !== srcBlock.piece.color) {
+            if (dy === 1 && Math.abs(dx) === 1 && board[dest.y][dest.x].piece !== null && destBlock.piece?.color !== srcBlock.piece.color) {
                 return true;
             }
 
             // Moving two squares on the first move
-            if (src.x === 6 && dx === 2 && dy === 0 && board[src.x -1][src.y].piece === null && board[src.x -2][src.y].piece === null) {
+            if (src.y === 6 && dy === 2 && dx === 0 && board[src.y -1][src.x].piece === null && board[src.y -2][src.x].piece === null) {
                 return true;
             }
 
@@ -35,17 +35,17 @@ export const pawnMovement: IMoveStrategy = {
             // Black pawn moves downwards (increasing y)
 
             // Moving one square forward
-            if (dx === -1 && dy === 0 && destBlock.piece === null) {
+            if (dy === -1 && dx === 0 && destBlock.piece === null) {
                 return true;
             }
 
             // Capturing diagonally
-            if (dx === -1 && Math.abs(dy) === 1 && destBlock.piece !== null && destBlock.piece?.color !== srcBlock.piece.color) {
+            if (dy === -1 && Math.abs(dx) === 1 && destBlock.piece !== null && destBlock.piece?.color !== srcBlock.piece.color) {
                 return true;
             }
 
             // Moving two squares on the first move
-            if (src.x === 1 && dx === -2 && dy === 0 && board[src.x + 1][src.y].piece === null && board[src.x + 2][src.y].piece === null) {
+            if (src.y === 1 && dy === -2 && dx === 0 && board[src.y + 1][src.x].piece === null && board[src.y + 2][src.x].piece === null) {
                 return true;
             }
         }

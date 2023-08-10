@@ -5,7 +5,7 @@ import { useRef } from 'react';
 
 const Movement = () => {
 
-    const { state, forward, backward } = useAppContext();
+    const { state, backward } = useAppContext();
 
 
     const scrollableRef = useRef<HTMLDivElement | null>(null);

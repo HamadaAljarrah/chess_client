@@ -18,7 +18,7 @@ export const queenMovement: IMoveStrategy = {
 
         // Collision detection loop
         while (x !== dest.x || y !== dest.y) {
-            if (board[x][y]?.piece !== null) {
+            if (board[y][x]?.piece !== null) {
                 return false; // Collision detected
             }
 
@@ -26,8 +26,8 @@ export const queenMovement: IMoveStrategy = {
             y += dy;
         }
 
-        const destBlock = board[dest.x][dest.y];
-        const srcBlock = board[src.x][src.y];
+        const destBlock = board[dest.y][dest.x];
+        const srcBlock = board[src.y][src.x];
 
         // Same color piece check
         if (destBlock.piece !== null && destBlock.piece.color === srcBlock.piece?.color) {
