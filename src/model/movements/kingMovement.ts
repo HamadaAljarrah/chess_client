@@ -1,3 +1,4 @@
+import { safeBlock } from "@/helpers/game";
 import { IMoveStrategy } from "../piece";
 import { Index, Square } from "../types";
 
@@ -5,6 +6,14 @@ export const kingMovement: IMoveStrategy = {
     canMove: (src: Index, dest: Index, board: Square[][]) => {
         const dx = Math.abs(src.x - dest.x);
         const dy = Math.abs(src.y - dest.y);
+
+
+        // Safe block
+        // const king = board[src.x][src.y].piece;
+        // if(king && !safeBlock(src,king.color,board)){
+        //     return false;
+        // }
+
 
         // Check for valid single-square move (including diagonals)
         if (

@@ -10,11 +10,11 @@ export const pawnMovement: IMoveStrategy = {
         const dy = src.y - dest.y;
 
         const srcBlock = board[src.x][src.y];
+        const destBlock = board[dest.x][dest.y];
 
-     
-
+    
         if (srcBlock.piece?.color === 'white') {
-            // White pawn moves upwards (decreasing y)
+            // White pawn moves upwards
 
             // Moving one square forward
             if (dx === 1 && dy === 0 && board[dest.x][dest.y].piece === null) {
@@ -22,12 +22,12 @@ export const pawnMovement: IMoveStrategy = {
             }
 
             // Capturing diagonally
-            if (dx === 1 && Math.abs(dy) === 1 && board[dest.x][dest.y].piece !== null) {
+            if (dx === 1 && Math.abs(dy) === 1 && board[dest.x][dest.y].piece !== null && destBlock.piece?.color !== srcBlock.piece.color) {
                 return true;
             }
 
             // Moving two squares on the first move
-            if (src.x === 6 && dx === 2 && dy === 0 && board[src.x - 1][src.y].piece === null) {
+            if (src.x === 6 && dx === 2 && dy === 0 && board[src.x -1][src.y].piece === null && board[src.x -2][src.y].piece === null) {
                 return true;
             }
 
@@ -35,17 +35,17 @@ export const pawnMovement: IMoveStrategy = {
             // Black pawn moves downwards (increasing y)
 
             // Moving one square forward
-            if (dx === -1 && dy === 0 && board[dest.x][dest.y].piece === null) {
+            if (dx === -1 && dy === 0 && destBlock.piece === null) {
                 return true;
             }
 
             // Capturing diagonally
-            if (dx === -1 && Math.abs(dy) === 1 && board[dest.x][dest.y].piece !== null) {
+            if (dx === -1 && Math.abs(dy) === 1 && destBlock.piece !== null && destBlock.piece?.color !== srcBlock.piece.color) {
                 return true;
             }
 
             // Moving two squares on the first move
-            if (src.x === 1 && dx === -2 && dy === 0 && board[src.x + 1][src.y].piece === null) {
+            if (src.x === 1 && dx === -2 && dy === 0 && board[src.x + 1][src.y].piece === null && board[src.x + 2][src.y].piece === null) {
                 return true;
             }
         }

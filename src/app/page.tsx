@@ -10,7 +10,7 @@ export default function Home() {
 
     return (
         <AppContextProvider >
-            <div className="flex gap-2">
+            <div className="flex  pt-4 gap-8 justify-center items-start  ">
                 <Board />
                 <Movement />
             </div>

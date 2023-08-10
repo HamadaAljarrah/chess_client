@@ -1,12 +1,11 @@
 import { initBoard } from "@/helpers/game";
-import { Color, Square } from "@/model/types";
+import { Color, Index, Square } from "@/model/types";
 import { ReactNode, createContext, useContext, useReducer } from "react";
 import { reducer } from "./reducer";
 
 export type AppActions =
     | { type: 'MOVE_PIECE', payload: { block: Square } }
     | { type: 'STATE_BACKWARD' }
-    | { type: 'STATE_FORWARD' }
 
 
 
@@ -24,7 +23,6 @@ export type AppState = {
 export interface AppContext {
     state: AppState,
     movePiece: (block: Square) => void
-    forward: () => void
     backward: () => void
 
 
@@ -40,19 +38,18 @@ export const initialState: AppState = {
 
     boardBackup: [initBoard()],
     backupIndex: 0,
-    currentPlayer: 'white'
+    currentPlayer: 'white',
 }
 
 const AppContextProvider = ({ children }: { children: ReactNode }) => {
     const [state, dispatch] = useReducer(reducer, initialState);
 
     const movePiece = (block: Square) => dispatch({ type: "MOVE_PIECE", payload: { block } })
-    const forward = () => dispatch({ type: "STATE_FORWARD" })
     const backward = () => dispatch({ type: "STATE_BACKWARD" })
 
 
     return (
-        <appContext.Provider value={{ state, movePiece, forward, backward }}>
+        <appContext.Provider value={{ state, movePiece, backward }}>
             {children}
         </appContext.Provider>
     )

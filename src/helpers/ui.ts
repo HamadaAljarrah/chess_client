@@ -1,5 +1,5 @@
 import { Square } from "@/model/types";
-import { copyBoard } from "./game";
+import { copyBoard, isCastlingMove } from "./game";
 import { Piece } from "@/model/piece";
 
 
@@ -23,6 +23,10 @@ export const showValidBlocks = (
             if (x === piece.index.x && y === piece.index.y) {
                 copy[x][y].focus = true;
             }
+            if(isCastlingMove(piece.index, {x,y}, piece.color, board)){
+                copy[x][y].availibale = true;
+            }
+
         }
     }
 

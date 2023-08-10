@@ -1,4 +1,4 @@
-import { notChangingPosition } from "@/helpers/game";
+import { isSameIndex } from "@/helpers/game";
 import { Color, Index, Square } from "./types";
 
 export interface IMoveStrategy {
@@ -28,11 +28,14 @@ export abstract class Piece {
     }
 
     public isLegalMove(src: Index, dest: Index, board: Square[][]): boolean {
-        if (notChangingPosition(src, dest)) {
+        if (isSameIndex(src, dest)) 
             return false; // Not changing position
-        }
+        
         return this.moveStrategy.canMove(src, dest, board);
     }
+    
 
     abstract clone(): Piece;
+    abstract getReachableSquares(board:Square[][]): Square[][];
+
 }

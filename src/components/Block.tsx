@@ -24,8 +24,9 @@ const Block = ({ onClick, block, src,routate, ...props }: Props) => {
                 justify-center
                 items-center
                 relative
-                w-[100px]
-                h-[100px]
+                w-[calc(1/8%)]
+                h-[calc(1/8%)]
+                aspect-square
             `}>
             {
                 block.availibale &&

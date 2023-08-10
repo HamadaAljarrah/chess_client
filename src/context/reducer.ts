@@ -1,7 +1,10 @@
 import {
+    castle,
     copyBoard,
     copyBoardBackup,
     createScript,
+    getPiecesIndex,
+    isCastlingMove,
     makeMove,
 } from "@/helpers/game";
 import { AppActions, AppState } from "./board-context";
@@ -38,6 +41,21 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
 
             // Second click
             if (currentBlock) {
+
+    
+
+
+                // Is castling move
+                if(isCastlingMove(currentBlock.index, payloadBlock.index, state.currentPlayer, state.board)){                                        
+                    let board = castle(payloadBlock.index, state.currentPlayer, state.board)
+                    board = clearUiHelp(board);
+                    const movementScripts = [...state.movementScripts, 'Castle'];
+                    const boardBackup = [...copyBoardBackup(state.boardBackup), board];
+                    const currentPlayer = state.currentPlayer === 'white' ? 'black': 'white'; 
+                    return {...state, board, movementScripts, boardBackup, currentPlayer};
+                }
+                
+
                 // Invalid move
                 if (!currentBlock.piece?.isLegalMove(currentBlock.index,payloadBlock.index,state.board)) {
                     let updatedBoard = clearUiHelp(state.board);
@@ -48,6 +66,8 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
                     };
                 }
 
+               
+                
 
                 // Valid move
                 const script = createScript(currentBlock.index,payloadBlock.index); // Create script
@@ -71,7 +91,7 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
                     currentBlock: null,
                     backupIndex: state.backupIndex + 1,
                     movementScripts,
-                    currentPlayer
+                    currentPlayer,
                 };
             }
 

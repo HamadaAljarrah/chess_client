@@ -13,12 +13,8 @@ const Board = () => {
     }
 
 
-
-
-
-
     return (
-        <div className="grid grid-cols-8 grid-rows-8 w-[800px] h-[800px] border-slate-800 border-[2px] box-content">
+        <div className="grid grid-cols-8 gap-0 px- border-slate-800 border-[2px] box-content w-[75%]">
             {state.board.map((row, rowIdx) => {
                 let char = "@"
                 return row.map((col, colIdx) => {
@@ -27,7 +23,7 @@ const Board = () => {
                     return (
                         <div
                             key={rowIdx + "-" + colIdx}
-                            className='relative'>
+                            className='relative '>
 
                             {rowIdx === 7 &&
                                 <p className={`
@@ -55,12 +51,11 @@ const Board = () => {
                             />
                         </div>
                     )
-                }
-                )
+                })
             }
-
             )}
         </div>
+
     )
 }
 
