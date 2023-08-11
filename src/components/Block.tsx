@@ -1,5 +1,4 @@
-import { Square, Color, Index } from "@/model/types"
-import { useState } from "react"
+import { Square } from "@/model/types"
 
 interface Props {
     block: Square,
@@ -20,6 +19,7 @@ const Block = ({ onClick, block, src,routate, ...props }: Props) => {
     return (
         <div onClick={handleClick} {...props} className={` 
                 ${block.color === 'black' ? "bg-slate-600" : "bg-slate-50"}
+                cursor-pointer
                 flex
                 justify-center
                 items-center
@@ -27,6 +27,7 @@ const Block = ({ onClick, block, src,routate, ...props }: Props) => {
                 w-[calc(1/8%)]
                 h-[calc(1/8%)]
                 aspect-square
+                
             `}>
             {
                 block.availibale &&

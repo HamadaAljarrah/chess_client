@@ -5,7 +5,6 @@ import { Knight } from "@/model/pieces/knight";
 import { Pawn } from "@/model/pieces/pawn";
 import { Queen } from "@/model/pieces/queen";
 import { Rook } from "@/model/pieces/rook";
-import { kingMovement } from "@/model/movements/kingMovement";
 
 export const initBoard = (): Square[][] => {
     const board: Square[][] = [];
@@ -32,12 +31,12 @@ export const initBoard = (): Square[][] => {
             switch (y) {
                 case 0:
                     board[y][0].piece = new Rook("black", { x: 0, y }, true);
-                    board[y][1].piece = new Knight("black", { x: 1, y});
-                    board[y][2].piece = new Bishop("black", { x: 2, y});
-                    board[y][3].piece = new Queen("black", { x: 3, y});
-                    board[y][4].piece = new King("black", { x: 4, y}, true);
+                    board[y][1].piece = new Knight("black", { x: 1, y });
+                    board[y][2].piece = new Bishop("black", { x: 2, y });
+                    board[y][3].piece = new Queen("black", { x: 3, y });
+                    board[y][4].piece = new King("black", { x: 4, y }, true);
                     board[y][5].piece = new Bishop("black", { x: 5, y });
-                    board[y][6].piece = new Knight("black", { x: 6, y});
+                    board[y][6].piece = new Knight("black", { x: 6, y });
                     board[y][7].piece = new Rook("black", { x: 7, y }, true);
                     break;
                 case 1:
@@ -50,12 +49,12 @@ export const initBoard = (): Square[][] => {
 
                 case 7:
                     board[y][0].piece = new Rook("white", { x: 0, y }, true);
-                    board[y][1].piece = new Knight("white", { x: 1, y});
-                    board[y][2].piece = new Bishop("white", { x: 2, y});
-                    board[y][3].piece = new Queen("white", { x: 3, y});
-                    board[y][4].piece = new King("white", { x: 4, y}, true);
+                    board[y][1].piece = new Knight("white", { x: 1, y });
+                    board[y][2].piece = new Bishop("white", { x: 2, y });
+                    board[y][3].piece = new Queen("white", { x: 3, y });
+                    board[y][4].piece = new King("white", { x: 4, y }, true);
                     board[y][5].piece = new Bishop("white", { x: 5, y });
-                    board[y][6].piece = new Knight("white", { x: 6, y});
+                    board[y][6].piece = new Knight("white", { x: 6, y });
                     board[y][7].piece = new Rook("white", { x: 7, y }, true);
                     break;
             }
@@ -73,27 +72,11 @@ export function copyBoardBackup(boardBackup: Square[][][]): Square[][][] {
     return boardBackup.map((board) => copyBoard(board));
 }
 
-export const makeMove = (
-    src: Index,
-    dest: Index,
-    board: Square[][]
-): Square[][] => {
-    const copy = copyBoard(board);
-    const piece = copy[src.y][src.x].piece;
-    if (piece) {
-        const newPiece = piece.clone();
-        newPiece.index = { x: dest.x, y: dest.y };
-        copy[dest.y][dest.x].piece = newPiece;
-        copy[src.y][src.x].piece = null;
-    }
-    return copy;
-};
-
 export const isSameIndex = (src: Index, dest: Index): boolean => {
     return src.x === dest.x && src.y === dest.y;
 };
 
-export const createScript = (src: Index, dest: Index): string => {
+export const createMovementString = (src: Index, dest: Index): string => {
     const MOVEMENT_SCRIPTS_COL = ["A", "B", "C", "D", "E", "F", "G", "H"];
     const MOVEMENT_SCRIPTS_ROW = ["8", "7", "6", "5", "4", "3", "2", "1"];
     const script =
@@ -106,31 +89,12 @@ export const createScript = (src: Index, dest: Index): string => {
     return script;
 };
 
-export const checkMate = (index: Index, board: Square[][]): boolean => {
-    const { x, y } = index;
 
-    const possibleMoves = [
-        { dx: 1, dy: 0 }, 
-        { dx: -1, dy: 0 }, 
-        { dx: 0, dy: 1 }, 
-        { dx: 0, dy: -1 }, 
-        { dx: -1, dy: -1 }, 
-        { dx: 1, dy: -1 }, 
-        { dx: 1, dy: 1 }, 
-        { dx: -1, dy: 1 }, 
-    ];
-
-    for (const move of possibleMoves) {
-        const newX = x + move.dx;
-        const newY = y + move.dy;
-
-        if (kingMovement.canMove({ x, y }, { x: newX, y: newY }, board)) {
-            return false;
-        }
-    }
-
-    return true;
+export const inBoundary = (x: number, y: number) => {
+    return x >= 0 && x < 8 && y >= 0 && y < 8;
 };
+
+
 
 export const isCastlingMove = (
     src: Index,
@@ -156,7 +120,7 @@ export const isCastlingMove = (
     if (
         !board[indexY][src.x].piece ||
         !(board[indexY][src.x].piece instanceof King) ||
-        !(board[indexY][src.x].piece as King).isFirstMove()
+        !(board[indexY][src.x].piece as King).firstMove
     ) {
         //console.log("King not first move");
         return false;
@@ -167,7 +131,7 @@ export const isCastlingMove = (
     if (
         !board[indexY][rookXindex].piece ||
         !(board[indexY][rookXindex].piece instanceof Rook) ||
-        !(board[indexY][rookXindex].piece as Rook).isFirstMove()
+        !(board[indexY][rookXindex].piece as Rook).firstMove
     ) {
         //console.log("Rook not first move");
         return false;
@@ -182,7 +146,6 @@ export const isCastlingMove = (
     }
 
     //TODO: King not checked before and after custling
-
 
     // All conditions met
     return true;
@@ -200,7 +163,7 @@ export const castle = (
     const copy = copyBoard(board);
     const rook = copy[y][rookXIndex].piece;
     const king = copy[y][kingXIndex].piece;
-    if (rook && king) {        
+    if (rook && king) {
         const destKingXIndex = rookXIndex === 7 ? 6 :2;
         const destRookXIndex = rookXIndex === 7 ? 5 :3;
         const rookClone = rook.clone();
@@ -214,24 +177,10 @@ export const castle = (
     return copy;
 };
 
-// Not checked for x and y swich
-
-export const getPiecesIndex = (color:Color, board:Square[][]): Index[]=>{
-    const indexes: Index[] = []
-
-    for (const row of board) {
-        for (const col of row) {
-            if (col.piece && col.piece.color === color) {
-                indexes.push({...col.index});
-            }
-        }
-    }
-    return indexes;
-}
 
 
 export const safeBlock = (src: Index, opponents:Index[], board: Square[][]):boolean =>{
-    
+
     // Get possible moves
     const possibleMoves = [
         { dx: 1, dy: 0 }, // Down
@@ -245,24 +194,12 @@ export const safeBlock = (src: Index, opponents:Index[], board: Square[][]):bool
     ];
 
     // Check every opponent pieces in board and see if they can move to kings possible moves
-    const { x, y } = src;
-    for (const move of possibleMoves){
-        const dest = { x: x + move.dx, y: y + move.dy };
-        opponents.forEach(index => {
-            const piece = board[index.x][index.y].piece
-            if(piece && piece.isLegalMove({x:index.x,y:index.y},dest,board)){
-                return false;
-            }  
-        })
-    }
+   
 
     // handle pawn edge case
 
     // handle pinning pieces, pieces that cannot move due to covering king
 
     return true;
-              
 
 }
-    
-

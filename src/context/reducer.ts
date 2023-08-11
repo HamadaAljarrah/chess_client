@@ -1,25 +1,21 @@
-import {
-    castle,
-    copyBoard,
-    copyBoardBackup,
-    createScript,
-    isCastlingMove,
-    makeMove,
-} from "@/helpers/game";
+import { castle, createMovementString, isCastlingMove } from "@/helpers/game";
 import { AppActions, AppState } from "./board-context";
-import { clearUiHelp, showValidBlocks } from "@/helpers/ui";
+import { clearPossibleMoves, showPossibleMoves } from "@/helpers/ui";
 
 export const reducer = (state: AppState, actions: AppActions): AppState => {
     switch (actions.type) {
         case "MOVE_PIECE":
 
-            // Check player turn
-            if(!state.currentBlock && actions.payload.block.piece?.color !== state.currentPlayer){
-                return {...state} 
-            }
-
             const payloadBlock = actions.payload.block;
             const currentBlock = state.currentBlock;
+
+            //Check player turn
+            if(!currentBlock && payloadBlock.piece && state.currentPlayer !== payloadBlock.piece.color){
+                console.log("not player turn");
+                
+                return {...state, currentBlock:null}
+            }
+            
            
             // Ignore empty fields
             if (!payloadBlock.piece && !currentBlock) {
@@ -29,88 +25,69 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
 
             // First click
             if (!currentBlock && payloadBlock.piece) {
-                const piece = payloadBlock.piece;
-                let updatedBoard = showValidBlocks(piece, state.board);
+                const board = showPossibleMoves(payloadBlock.piece, state.board)
                 return {
                     ...state,
+                    board,
                     currentBlock: actions.payload.block,
-                    board: updatedBoard,
                 };
             }
 
             // Second click
-            if (currentBlock) {
+            if (currentBlock && currentBlock.piece) {
 
-    
+                // ------------- Castling ------------------//
+
+               
 
 
-                // Is castling move
-                if(isCastlingMove(currentBlock.index, payloadBlock.index, state.currentPlayer, state.board)){                                        
-                    let board = castle(payloadBlock.index, state.currentPlayer, state.board)
-                    board = clearUiHelp(board);
-                    const movementScripts = [...state.movementScripts, 'Castle'];
-                    const boardBackup = [...copyBoardBackup(state.boardBackup), board];
-                    const currentPlayer = state.currentPlayer === 'white' ? 'black': 'white'; 
-                    return {...state, board, movementScripts, boardBackup, currentPlayer};
-                }
-                
+                // ------------- Not valid move------------------//
 
-                // Invalid move
-                if (!currentBlock.piece?.isLegalMove(currentBlock.index,payloadBlock.index,state.board)) {
-                    let updatedBoard = clearUiHelp(state.board);
+                const validMoves = currentBlock.piece.getValidMoves(state.board);
+                const isValid = validMoves.some((index) => index.x === payloadBlock.index.x && index.y === payloadBlock.index.y)
+
+                if(!isValid){
+                    // Clear possible moves 
+                    console.log("not valid");
+                    
+                    const board = clearPossibleMoves(state.board)   
                     return {
                         ...state,
-                        board: updatedBoard,
-                        currentBlock: null,
+                        board, 
+                        currentBlock:null
                     };
                 }
 
-               
+                // -------------Valid move-------------//
+
+                // Update board with move
+                let board = currentBlock.piece.makeMove(payloadBlock.index, state.board);
+
+
+                // Clear possible moves 
+                board = clearPossibleMoves(board)  
+
+
+                // Update history
+                const history = [...state.history, createMovementString(currentBlock.index, payloadBlock.index)]
+
+
+                //switch player
+                //const currentPlayer = state.currentPlayer === 'white' ? 'black' : 'white';
+
                 
-
-                // Valid move
-                const script = createScript(currentBlock.index,payloadBlock.index); // Create script
-
-                const movementScripts = [...state.movementScripts, script]; // Update the movement script
-
-                let board = clearUiHelp(state.board); // Clear green and purple squares and deep copy board
-
-                board = makeMove(currentBlock.index,payloadBlock.index,board); // Update board
-
-                const boardBackup = [...copyBoardBackup(state.boardBackup), board]; // Update board backup
-
-                const currentPlayer = state.currentPlayer === 'white' ? 'black': 'white'; // Switch player
-
-                
-
                 return {
                     ...state,
+                    history,
                     board,
-                    boardBackup,
+                    //currentPlayer,
                     currentBlock: null,
-                    backupIndex: state.backupIndex + 1,
-                    movementScripts,
-                    currentPlayer,
                 };
             }
+            
 
         case "STATE_BACKWARD":
-            if (state.backupIndex > 0) {
-                let movementScripts = [...state.movementScripts].slice(0, -1); // Remove last script
-                const backupIndex = state.backupIndex - 1; // Update histroy index
-                const boardBackup = copyBoardBackup(state.boardBackup).slice(0, -1); // Remove last board from backup
-                const board = copyBoard(state.boardBackup[backupIndex]); // Get the right board
-                const currentPlayer = state.currentPlayer === 'white' ? 'black': 'white'; // Switch player
-                return {
-                    ...state,
-                    movementScripts,
-                    board,
-                    boardBackup,
-                    backupIndex,
-                    currentBlock: null,
-                    currentPlayer
-                };
-            }
+            
             return { ...state };
 
         default:
