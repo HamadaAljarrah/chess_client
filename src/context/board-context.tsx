@@ -13,10 +13,10 @@ export type AppState = {
     board: Square[][],
     currentBlock: Square | null,
     history: string[],
-
+    currentPlayer: Color
+    kingPosition: Record<Color, Index>,
     boardBackup: Square[][][],
     backupIndex: number
-    currentPlayer: Color
 }
 
 
@@ -35,7 +35,7 @@ export const initialState: AppState = {
     board: initBoard(),
     currentBlock: null,
     history: [],
-
+    kingPosition: {white: {y:7,x:0}, black: {x:4,y:0}},
     boardBackup: [initBoard()],
     backupIndex: 0,
     currentPlayer: 'white',

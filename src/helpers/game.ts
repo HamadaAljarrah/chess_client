@@ -89,66 +89,8 @@ export const createMovementString = (src: Index, dest: Index): string => {
     return script;
 };
 
-
 export const inBoundary = (x: number, y: number) => {
     return x >= 0 && x < 8 && y >= 0 && y < 8;
-};
-
-
-
-export const isCastlingMove = (
-    src: Index,
-    dest: Index,
-    color: Color,
-    board: Square[][]
-): boolean => {
-    const indexY = color === "white" ? 7 : 0;
-
-    // King moving 2 steps right or 3 steps left
-    if (
-        !(
-            Math.abs(src.x - dest.x) === 2 &&
-            src.y === indexY &&
-            dest.y === indexY
-        )
-    ) {
-        //console.log("Not custling");
-        return false;
-    }
-
-    // King first move
-    if (
-        !board[indexY][src.x].piece ||
-        !(board[indexY][src.x].piece instanceof King) ||
-        !(board[indexY][src.x].piece as King).firstMove
-    ) {
-        //console.log("King not first move");
-        return false;
-    }
-
-    // Rook first move
-    const rookXindex = dest.x === 6 ? 7 : 0;
-    if (
-        !board[indexY][rookXindex].piece ||
-        !(board[indexY][rookXindex].piece instanceof Rook) ||
-        !(board[indexY][rookXindex].piece as Rook).firstMove
-    ) {
-        //console.log("Rook not first move");
-        return false;
-    }
-
-    // None piece blocking
-    const blockingIndices = rookXindex === 7 ? [6, 5] : [1, 2, 3];
-    const hasBlockedPiece = blockingIndices.some((x) => board[indexY][x].piece);
-    if (hasBlockedPiece) {
-        //console.log("Piece blocking");
-        return false;
-    }
-
-    //TODO: King not checked before and after custling
-
-    // All conditions met
-    return true;
 };
 
 export const castle = (
@@ -164,42 +106,50 @@ export const castle = (
     const rook = copy[y][rookXIndex].piece;
     const king = copy[y][kingXIndex].piece;
     if (rook && king) {
-        const destKingXIndex = rookXIndex === 7 ? 6 :2;
-        const destRookXIndex = rookXIndex === 7 ? 5 :3;
+        const destKingXIndex = rookXIndex === 7 ? 6 : 2;
+        const destRookXIndex = rookXIndex === 7 ? 5 : 3;
         const rookClone = rook.clone();
         const kingClone = king.clone();
-        copy[y][kingXIndex].piece = null // Delete the king
-        copy[y][rookXIndex].piece = null // Delete the rook
-        copy[y][destKingXIndex].piece = kingClone // Put the king clone
-        copy[y][destRookXIndex].piece = rookClone // Put the rook clone
+        rookClone.index = { x: destRookXIndex, y };
+        kingClone.index = { x: destKingXIndex, y };
+        copy[y][kingXIndex].piece = null; // Delete the king
+        copy[y][rookXIndex].piece = null; // Delete the rook
+        copy[y][destKingXIndex].piece = kingClone; // Put the king clone
+        copy[y][destRookXIndex].piece = rookClone; // Put the rook clone
     }
 
     return copy;
 };
 
+const pieceCanMoveToIndex = (index: Index, color: Color, board: Square[][]) => {
+    for (const row of board) {
+        for (const col of row) {
+            const piece = col.piece;
+            if (
+                piece &&
+                !(piece instanceof King) &&
+                piece.color !== color &&
+                piece
+                    .getValidMoves(board)
+                    .some((i) => i.x === index.x && i.y === index.y)
+            ) {
+                return true;
+            }
+        }
+    }
+    return false;
+};
 
-
-export const safeBlock = (src: Index, opponents:Index[], board: Square[][]):boolean =>{
-
-    // Get possible moves
-    const possibleMoves = [
-        { dx: 1, dy: 0 }, // Down
-        { dx: -1, dy: 0 }, // Up
-        { dx: 0, dy: 1 }, // Right
-        { dx: 0, dy: -1 }, // Left
-        { dx: -1, dy: -1 }, // Up-left
-        { dx: -1, dy: 1 }, // Up-right
-        { dx: 1, dy: -1 }, // Down-left
-        { dx: 1, dy: 1 }, // Down-right
-    ];
-
-    // Check every opponent pieces in board and see if they can move to kings possible moves
-   
-
-    // handle pawn edge case
-
-    // handle pinning pieces, pieces that cannot move due to covering king
+export const kingNotChecked = (
+    index: Index,
+    color: Color,
+    board: Square[][]
+): boolean => {
+    if (pieceCanMoveToIndex(index, color, board)) {
+        return false;
+    }
 
     return true;
+};
 
-}
+

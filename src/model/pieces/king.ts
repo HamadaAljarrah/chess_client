@@ -3,8 +3,8 @@ import { Piece } from "../piece";
 import {
     castle,
     inBoundary,
-    isCastlingMove,
     isSameIndex,
+    kingNotChecked,
 } from "@/helpers/game";
 import { Rook } from "./rook";
 
@@ -56,7 +56,7 @@ export class King extends Piece {
                 const destPiece = board[newY][newX].piece;
                 const friend = destPiece && destPiece.color === this.color;
 
-                if (!friend) {
+                if (!friend && kingNotChecked({ x: newX, y: newY }, this.color, board) ) {
                     indexes.push({ x: newX, y: newY });
                 }
             }
@@ -74,17 +74,19 @@ export class King extends Piece {
             const rookXindex = move.dx === 2 ? 7 : 0;
 
             if (inBoundary(newX, newY)) {
-                const rook = board[indexY][rookXindex].piece;
-                const blockingIndices = rookXindex === 7 ? [6, 5] : [1, 2, 3];
+                const rook = board[indexY][rookXindex].piece; // Rook exist
+                const blockingIndices = rookXindex === 7 ? [6, 5] : [1, 2, 3]; // Determine which rook
                 const hasBlockedPiece = blockingIndices.some(
                     (x) => board[indexY][x].piece
-                );
+                ); // No blocking pieces betweem king and rook
 
+                // Todo: add if king not checked
                 if (
                     this.firstMove &&
                     rook &&
                     (rook as Rook).firstMove &&
-                    !hasBlockedPiece
+                    !hasBlockedPiece &&
+                    kingNotChecked({ x: newX, y: newY }, this.color, board)
                 ) {
                     indexes.push({ x: newX, y: newY });
                     this.castling = true;
@@ -97,6 +99,7 @@ export class King extends Piece {
 
     public makeMove(dest: Index, board: Square[][]): Square[][] {
         if (this.castling) {
+            this.castling = false;
             return castle(dest, this.color, board);
         } else {
             return super.makeMove(dest, board);

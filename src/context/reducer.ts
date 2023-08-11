@@ -1,10 +1,12 @@
-import { castle, createMovementString, isCastlingMove } from "@/helpers/game";
+import { castle, createMovementString } from "@/helpers/game";
 import { AppActions, AppState } from "./board-context";
 import { clearPossibleMoves, showPossibleMoves } from "@/helpers/ui";
+import { King } from "@/model/pieces/king";
 
 export const reducer = (state: AppState, actions: AppActions): AppState => {
     switch (actions.type) {
         case "MOVE_PIECE":
+            console.log(state.kingPosition);
 
             const payloadBlock = actions.payload.block;
             const currentBlock = state.currentBlock;
@@ -36,8 +38,6 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
             // Second click
             if (currentBlock && currentBlock.piece) {
 
-                // ------------- Castling ------------------//
-
                
 
 
@@ -60,6 +60,15 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
 
                 // -------------Valid move-------------//
 
+
+
+                // Update king index if moving
+                let kingPosition = { ...state.kingPosition};
+                if (currentBlock.piece instanceof King) {
+                    kingPosition = { ...state.kingPosition, [state.currentPlayer]: { ...payloadBlock.index } };
+                }
+                
+
                 // Update board with move
                 let board = currentBlock.piece.makeMove(payloadBlock.index, state.board);
 
@@ -72,15 +81,16 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
                 const history = [...state.history, createMovementString(currentBlock.index, payloadBlock.index)]
 
 
-                //switch player
-                //const currentPlayer = state.currentPlayer === 'white' ? 'black' : 'white';
+                // Switch player
+                const currentPlayer = state.currentPlayer === 'white' ? 'black' : 'white';
 
                 
                 return {
                     ...state,
                     history,
                     board,
-                    //currentPlayer,
+                    kingPosition,
+                    currentPlayer,
                     currentBlock: null,
                 };
             }
