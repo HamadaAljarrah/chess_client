@@ -1,6 +1,6 @@
 import { Color, Index, Square } from "../types";
 import { Piece } from "../piece";
-import { copyBoard, inBoundary } from "@/helpers/game";
+import { inBoundary } from "@/helpers/game";
 
 export class Bishop extends Piece {
     constructor(color: Color, index: Index) {
@@ -26,9 +26,7 @@ export class Bishop extends Piece {
             { dx: -1, dy: -1 }, // Up-left
         ];
 
-        const copy = copyBoard(board);
-        copy[x][y].piece = null;
-        
+       
 
         for (const move of possibleMoves) {
             let newX = x + move.dx;

@@ -1,4 +1,4 @@
-import { castle, createMovementString } from "@/helpers/game";
+import { createMovementString, isMoveSafe } from "@/helpers/game";
 import { AppActions, AppState } from "./board-context";
 import { clearPossibleMoves, showPossibleMoves } from "@/helpers/ui";
 import { King } from "@/model/pieces/king";
@@ -12,9 +12,7 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
             const currentBlock = state.currentBlock;
 
             //Check player turn
-            if(!currentBlock && payloadBlock.piece && state.currentPlayer !== payloadBlock.piece.color){
-                console.log("not player turn");
-                
+            if(!currentBlock && payloadBlock.piece && state.currentPlayer !== payloadBlock.piece.color){                
                 return {...state, currentBlock:null}
             }
             
@@ -27,7 +25,8 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
 
             // First click
             if (!currentBlock && payloadBlock.piece) {
-                const board = showPossibleMoves(payloadBlock.piece, state.board)
+                
+                let board = showPossibleMoves(payloadBlock.piece, state.board)
                 return {
                     ...state,
                     board,
@@ -45,7 +44,6 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
 
                 const validMoves = currentBlock.piece.getValidMoves(state.board);
                 const isValid = validMoves.some((index) => index.x === payloadBlock.index.x && index.y === payloadBlock.index.y)
-
                 if(!isValid){
                     // Clear possible moves 
                     console.log("not valid");
@@ -56,6 +54,15 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
                         board, 
                         currentBlock:null
                     };
+                }
+
+                if(!isMoveSafe(currentBlock.piece, payloadBlock.index, state.board)){
+                    const board = clearPossibleMoves(state.board)   
+                    return {
+                        ...state,
+                        board,
+                        currentBlock: null
+                    }
                 }
 
                 // -------------Valid move-------------//

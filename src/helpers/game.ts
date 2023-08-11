@@ -5,6 +5,7 @@ import { Knight } from "@/model/pieces/knight";
 import { Pawn } from "@/model/pieces/pawn";
 import { Queen } from "@/model/pieces/queen";
 import { Rook } from "@/model/pieces/rook";
+import { Piece } from "@/model/piece";
 
 export const initBoard = (): Square[][] => {
     const board: Square[][] = [];
@@ -151,5 +152,66 @@ export const kingNotChecked = (
 
     return true;
 };
+
+export const getKingIndex = (color:Color, board: Square[][]):Index=>{
+    let index = {x:0,y:0}
+    if (color === 'white'){
+        // Start from bottom
+        outerLoop: for(let y = 7; y >= 0; y--){
+            for(const col of board[y]){
+                if(col.piece && col.piece.color === color && col.piece instanceof King) {
+                    index = { ...col.piece.index };
+                    break outerLoop;
+                }
+            
+            }
+        }
+        
+    } else {
+        // Start from top
+        outerLoop: for (const row of board) {
+            for (const col of row) {
+                if (col.piece && col.piece.color === color && col.piece instanceof King) {
+                    index = { ...col.piece.index };
+                    break outerLoop;
+                }
+            }
+        }
+    }
+
+    return index;
+}
+
+
+export const isMoveSafe = (piece: Piece, dest: Index, board: Square[][]): boolean => {
+    // Simulate the move on a temporary board
+    const tempBoard = copyBoard(board);
+    const oldX = piece.index.x;
+    const oldY = piece.index.y;
+    const newX = dest.x;
+    const newY = dest.y;
+
+    tempBoard[newY][newX].piece = tempBoard[oldY][oldX].piece;
+    tempBoard[oldY][oldX].piece = null;
+
+    // Find the king's position
+    const kingPosition = getKingIndex(piece.color,tempBoard);
+
+    // Check opponent's pieces for valid moves targeting the king's position
+    const opponentColor = piece.color === 'white' ? 'black' : 'white';
+    for (const row of tempBoard) {
+        for (const col of row) {
+            const opponentPiece = col.piece;
+            if (opponentPiece && opponentPiece.color === opponentColor) {
+                const validMoves = opponentPiece.getValidMoves(tempBoard);
+                if (validMoves.some(validMove => isSameIndex(validMove, kingPosition))) {
+                    return false; // Move exposes king to check
+                }
+            }
+        }
+    }
+
+    return true; // Move is safe
+}
 
 
