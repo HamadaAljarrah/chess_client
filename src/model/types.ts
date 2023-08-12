@@ -2,6 +2,8 @@ import { Piece } from "./piece";
 
 export type Color = "white" | "black";
 
+export type Winner = 'White' | 'Black' | null;
+
 export type Index = {
     x: number;
     y: number;

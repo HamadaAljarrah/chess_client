@@ -14,7 +14,7 @@ export default function Home() {
                 <Board />
                 <Movement />
             </div>
-
+            
         </AppContextProvider>
 
 
