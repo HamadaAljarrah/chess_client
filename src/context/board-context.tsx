@@ -1,5 +1,5 @@
 import { initBoard } from "@/helpers/game";
-import { Color, Index, Square } from "@/model/types";
+import { Color, Square } from "@/model/types";
 import { ReactNode, createContext, useContext, useReducer } from "react";
 import { reducer } from "./reducer";
 
@@ -14,9 +14,7 @@ export type AppState = {
     currentBlock: Square | null,
     history: string[],
     currentPlayer: Color
-    kingPosition: Record<Color, Index>,
-    boardBackup: Square[][][],
-    backupIndex: number
+
 }
 
 
@@ -35,9 +33,6 @@ export const initialState: AppState = {
     board: initBoard(),
     currentBlock: null,
     history: [],
-    kingPosition: {white: {y:7,x:0}, black: {x:4,y:0}},
-    boardBackup: [initBoard()],
-    backupIndex: 0,
     currentPlayer: 'white',
 }
 

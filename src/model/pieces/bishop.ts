@@ -36,7 +36,7 @@ export class Bishop extends Piece {
                 const piece = board[newY][newX].piece;
 
 
-                if (!board[newY][newX].piece) {
+                if (!piece) {
                     indexes.push({ x: newX, y: newY });
 
                 } else if (piece && piece.color !== this.color) {

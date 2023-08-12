@@ -6,6 +6,8 @@ import { Piece } from "@/model/piece";
 const removePossibleMove = (board:Square[][], indexes:Index[]):Square[][] => {
     for(const index of indexes){
         board[index.y][index.x].availibale = false;
+        board[index.y][index.x].danger = false;
+
     }
     return board
 }

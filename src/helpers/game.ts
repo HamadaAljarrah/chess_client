@@ -122,56 +122,31 @@ export const castle = (
     return copy;
 };
 
-const pieceCanMoveToIndex = (index: Index, color: Color, board: Square[][]) => {
-    for (const row of board) {
-        for (const col of row) {
-            const piece = col.piece;
-            if (
-                piece &&
-                !(piece instanceof King) &&
-                piece.color !== color &&
-                piece
-                    .getValidMoves(board)
-                    .some((i) => i.x === index.x && i.y === index.y)
-            ) {
-                return true;
-            }
-        }
-    }
-    return false;
-};
-
-export const kingNotChecked = (
-    index: Index,
-    color: Color,
-    board: Square[][]
-): boolean => {
-    if (pieceCanMoveToIndex(index, color, board)) {
-        return false;
-    }
-
-    return true;
-};
-
-export const getKingIndex = (color:Color, board: Square[][]):Index=>{
-    let index = {x:0,y:0}
-    if (color === 'white'){
+export const getKingIndex = (color: Color, board: Square[][]): Index => {
+    let index = { x: 0, y: 0 };
+    if (color === "white") {
         // Start from bottom
-        outerLoop: for(let y = 7; y >= 0; y--){
-            for(const col of board[y]){
-                if(col.piece && col.piece.color === color && col.piece instanceof King) {
+        outerLoop: for (let y = 7; y >= 0; y--) {
+            for (const col of board[y]) {
+                if (
+                    col.piece &&
+                    col.piece.color === color &&
+                    col.piece instanceof King
+                ) {
                     index = { ...col.piece.index };
                     break outerLoop;
                 }
-            
             }
         }
-        
     } else {
         // Start from top
         outerLoop: for (const row of board) {
             for (const col of row) {
-                if (col.piece && col.piece.color === color && col.piece instanceof King) {
+                if (
+                    col.piece &&
+                    col.piece.color === color &&
+                    col.piece instanceof King
+                ) {
                     index = { ...col.piece.index };
                     break outerLoop;
                 }
@@ -180,31 +155,28 @@ export const getKingIndex = (color:Color, board: Square[][]):Index=>{
     }
 
     return index;
-}
+};
 
-
-export const isMoveSafe = (piece: Piece, dest: Index, board: Square[][]): boolean => {
+export const isMoveSafe = (
+    piece: Piece,
+    dest: Index,
+    board: Square[][]
+): boolean => {
     // Simulate the move on a temporary board
-    const tempBoard = copyBoard(board);
-    const oldX = piece.index.x;
-    const oldY = piece.index.y;
-    const newX = dest.x;
-    const newY = dest.y;
-
-    tempBoard[newY][newX].piece = tempBoard[oldY][oldX].piece;
-    tempBoard[oldY][oldX].piece = null;
+    const copy = stimulateMove(piece.index, dest,board)
 
     // Find the king's position
-    const kingPosition = getKingIndex(piece.color,tempBoard);
+    const kingPosition = getKingIndex(piece.color, copy);
 
     // Check opponent's pieces for valid moves targeting the king's position
-    const opponentColor = piece.color === 'white' ? 'black' : 'white';
-    for (const row of tempBoard) {
+    const opponentColor = piece.color === "white" ? "black" : "white";
+    for (const row of copy) {
         for (const col of row) {
             const opponentPiece = col.piece;
             if (opponentPiece && opponentPiece.color === opponentColor) {
-                const validMoves = opponentPiece.getValidMoves(tempBoard);
-                if (validMoves.some(validMove => isSameIndex(validMove, kingPosition))) {
+                const validMoves = opponentPiece.getValidMoves(copy);
+                if (validMoves.some((validMove) =>isSameIndex(validMove, kingPosition))
+                ) {
                     return false; // Move exposes king to check
                 }
             }
@@ -212,6 +184,44 @@ export const isMoveSafe = (piece: Piece, dest: Index, board: Square[][]): boolea
     }
 
     return true; // Move is safe
+};
+
+export const stimulateMove = (src:Index, dest:Index,board:Square[][])=>{
+
+    const copy = copyBoard(board);
+    const piece = board[src.y][src.x].piece;
+    if(piece){
+        const newPiece = piece.clone();
+        newPiece.index = { x: dest.x, y: dest.y };
+        copy[dest.y][dest.x].piece = newPiece;
+        copy[src.y][src.x].piece = null;
+    }
+
+
+    return copy;
 }
 
-
+export const getNumOfSafeMove = (color: Color, board: Square[][]): number => {
+    let possible = 0;
+    for (const row of board) {
+        for (const col of row) {
+            const piece = col.piece;
+            if (
+                piece &&
+                piece.color === color &&
+                piece
+                    .getValidMoves(board)
+                    .some((index) => isMoveSafe(piece, index, board))
+            ) {
+                piece.getValidMoves(board).forEach((index) => {
+                    if (
+                        isMoveSafe(piece, index, board)
+                    ) {
+                        possible++;
+                    }
+                });
+            }
+        }
+    }
+    return possible;
+};

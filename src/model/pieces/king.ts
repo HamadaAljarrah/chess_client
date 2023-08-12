@@ -1,17 +1,10 @@
 import { Color, Index, Square } from "../types";
 import { Piece } from "../piece";
-import {
-    castle,
-    inBoundary,
-    isSameIndex,
-    kingNotChecked,
-} from "@/helpers/game";
+import { castle, inBoundary } from "@/helpers/game";
 import { Rook } from "./rook";
 
 export class King extends Piece {
-    private defualtIndex: Index;
     public firstMove: boolean;
-    private castling: boolean;
 
     constructor(color: Color, index: Index, isFirstMove: boolean) {
         const image =
@@ -20,20 +13,13 @@ export class King extends Piece {
                 : "./pieces/WHITE_KING.png";
         super(color, image, index);
         this.firstMove = isFirstMove;
-        this.defualtIndex = index;
-        this.castling = false;
     }
 
     public clone(): King {
         return new King(this.color, this.index, this.firstMove);
     }
 
-    private handleFirstMove(): void {
-        if (!isSameIndex(this.index, this.defualtIndex)) this.firstMove = false;
-    }
-
     public getValidMoves(board: Square[][]): Index[] {
-        this.handleFirstMove();
         const indexes: Index[] = [];
         const { x, y } = this.index;
 
@@ -51,13 +37,11 @@ export class King extends Piece {
         for (const move of possibleMoves) {
             const newX = x + move.dx;
             const newY = y + move.dy;
-
+            const dest = { x: newX, y: newY };
             if (inBoundary(newX, newY)) {
-                const destPiece = board[newY][newX].piece;
-                const friend = destPiece && destPiece.color === this.color;
-
-                if (!friend && kingNotChecked({ x: newX, y: newY }, this.color, board) ) {
-                    indexes.push({ x: newX, y: newY });
+                const piece = board[newY][newX].piece;
+                if (!piece || piece.color !== this.color) {
+                    indexes.push(dest);
                 }
             }
         }
@@ -80,16 +64,13 @@ export class King extends Piece {
                     (x) => board[indexY][x].piece
                 ); // No blocking pieces betweem king and rook
 
-                // Todo: add if king not checked
                 if (
                     this.firstMove &&
                     rook &&
                     (rook as Rook).firstMove &&
-                    !hasBlockedPiece &&
-                    kingNotChecked({ x: newX, y: newY }, this.color, board)
+                    !hasBlockedPiece
                 ) {
                     indexes.push({ x: newX, y: newY });
-                    this.castling = true;
                 }
             }
         }
@@ -98,8 +79,9 @@ export class King extends Piece {
     }
 
     public makeMove(dest: Index, board: Square[][]): Square[][] {
-        if (this.castling) {
-            this.castling = false;
+        this.firstMove = false;
+        const castling = Math.abs(dest.x - this.index.x) === 2;
+        if (castling) {
             return castle(dest, this.color, board);
         } else {
             return super.makeMove(dest, board);
