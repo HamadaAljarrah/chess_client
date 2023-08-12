@@ -7,6 +7,8 @@ import {
 import { AppActions, AppState } from "./board-context";
 import { clearPossibleMoves, showPossibleMoves } from "@/helpers/ui";
 import { Winner } from "@/model/types";
+import { io } from "socket.io-client";
+const socket = io("http://localhost:8080");
 
 export const reducer = (state: AppState, actions: AppActions): AppState => {
     switch (actions.type) {
@@ -116,14 +118,13 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
             }
 
         case "NEW_GAME":
-            
-            return { 
+            return {
                 board: initBoard(),
                 currentBlock: null,
-                currentPlayer: 'white',
+                currentPlayer: "white",
                 history: [],
                 winner: null,
-             };
+            };
 
         case "STATE_BACKWARD":
             return { ...state };

@@ -3,9 +3,11 @@ import { useAppContext } from '@/context/board-context'
 import React, { useEffect } from 'react'
 import { useRef } from 'react';
 
-const Movement = () => {
 
-    const { state, backward } = useAppContext();
+
+const Movement = ({className}: {className?:string}) => {
+
+    const { state } = useAppContext();
 
 
     const scrollableRef = useRef<HTMLDivElement | null>(null);
@@ -16,9 +18,7 @@ const Movement = () => {
       }, [state.history]);
 
     return (
-        <div className='px-2 flex flex-col gap-2 w-[25%]'>
-            {/* <button className='px-4 py-2 mb-2 bg-slate-600 text-white w-full' onClick={backward}>Regret Move</button> */}
-            
+        <div className={`px-2 flex flex-col gap-2 ${className}`}>            
             <div  ref={scrollableRef} className=' h-64 overflow-auto'>
                 {state.history.map((movement, index) => (
                     <p key={index} className={`

@@ -11,6 +11,7 @@ export type AppActions =
 
 
 
+
 export type AppState = {
     board: Square[][],
     currentBlock: Square | null,

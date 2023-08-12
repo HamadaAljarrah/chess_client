@@ -6,7 +6,7 @@ import { nextChar } from '@/helpers/ui'
 import Dialog from './Dialog'
 
 
-const Board = () => {
+const Board = ({className}: {className?:string}) => {
     const { state, movePiece, newGame } = useAppContext()
 
     const handleClick = (block: Square) => {
@@ -16,7 +16,7 @@ const Board = () => {
 
     return (
         <>
-            <div className="grid grid-cols-8 gap-0 px- border-slate-800 border-[2px] box-content w-[75%]">
+            <div className={`grid grid-cols-8 gap-0 px- border-slate-800 border-[2px] box-content ${className}`}>
                 {state.board.map((row, rowIdx) => {
                     let char = "@"
                     return row.map((col, colIdx) => {
