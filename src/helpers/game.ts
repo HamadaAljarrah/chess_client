@@ -1,4 +1,4 @@
-import { Square, Index, Color } from "@/model/types";
+import { Square, Index, Color, PieceName, PawnPromotion } from "@/model/types";
 import { Bishop } from "@/model/pieces/bishop";
 import { King } from "@/model/pieces/king";
 import { Knight } from "@/model/pieces/knight";
@@ -189,6 +189,7 @@ export const isMoveSafe = (
 export const stimulateMove = (src:Index, dest:Index,board:Square[][])=>{
 
     const copy = copyBoard(board);
+    
     const piece = board[src.y][src.x].piece;
     if(piece){
         const newPiece = piece.clone();
@@ -225,3 +226,43 @@ export const getNumOfSafeMove = (color: Color, board: Square[][]): number => {
     }
     return possible;
 };
+
+export const pawnPromotion = (color:Color, board:Square[][]): PawnPromotion =>{
+    const indexY = color === 'white' ? 0 : 7 ;
+
+    for(const col of board[indexY]){
+        if(col.piece instanceof Pawn){
+            return ({index: {...col.index}, showDialog: true})
+        }
+    }
+
+    return ({index: null, showDialog: false})
+}
+
+export const promotePawn = (piece:PieceName, index:Index, color:Color, board:Square[][]): Square[][]=>{
+            const copy = copyBoard(board);
+            const {x,y} = index;
+            switch (piece) {
+                case 'BISHOP':
+                    copy[y][x].piece = new Bishop(color,{x,y});
+                break;
+
+                case 'KNIGHT':
+                    copy[y][x].piece =  new Knight(color,{x,y});
+                break;
+
+                case 'QUEEN':
+                    console.log("Is here");
+                    
+                    copy[y][x].piece = new Queen(color,{x,y});
+                break;
+
+                case 'ROOK':
+                    copy[y][x].piece = new Rook(color,{x,y}, false);
+                break;
+            
+                default:
+                    break;
+            }
+    return copy;
+}

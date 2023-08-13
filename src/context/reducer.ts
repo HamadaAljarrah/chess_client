@@ -3,12 +3,14 @@ import {
     getNumOfSafeMove,
     initBoard,
     isMoveSafe,
+    stimulateMove,
+    pawnPromotion,
+    promotePawn,
 } from "@/helpers/game";
 import { AppActions, AppState } from "./board-context";
 import { clearPossibleMoves, showPossibleMoves } from "@/helpers/ui";
-import { Winner } from "@/model/types";
-import { io } from "socket.io-client";
-const socket = io("http://localhost:8080");
+import { PawnPromotion, Winner } from "@/model/types";
+import { socket } from "../model/socket";
 
 export const reducer = (state: AppState, actions: AppActions): AppState => {
     switch (actions.type) {
@@ -97,6 +99,10 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
                     ),
                 ];
 
+                // Check Pawn promotion                
+                const promotion = pawnPromotion(state.currentPlayer,board)
+
+
                 // Switch player
                 const currentPlayer =
                     state.currentPlayer === "white" ? "black" : "white";
@@ -107,11 +113,18 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
                     winner = currentPlayer === "white" ? "Black" : "White";
                 }
 
+                // Broadcast move
+                socket.emit("sendMove", {
+                    from: currentBlock.index,
+                    to: payloadBlock.index,
+                });
+
                 return {
                     ...state,
                     history,
                     board,
                     currentPlayer,
+                    promotion,
                     currentBlock: null,
                     winner,
                 };
@@ -124,10 +137,39 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
                 currentPlayer: "white",
                 history: [],
                 winner: null,
+                promotion: {
+                    index: null,
+                    showDialog: false
+                }
             };
 
-        case "STATE_BACKWARD":
-            return { ...state };
+        case "GAME_UPDATE":
+            const { from, to } = actions.payload;
+            const board = stimulateMove(from, to, state.board);
+            const currentPlayer =
+                state.currentPlayer === "white" ? "black" : "white";
+            return { ...state, board, currentPlayer, currentBlock: null };
+
+
+
+        case "PROMOTE_PAWN":
+            if(state.promotion.index){
+                return {
+                    ...state,
+                    board: promotePawn(
+                        actions.payload.piece,
+                        state.promotion.index,
+                        state.currentPlayer === 'black' ? 'white':'black',
+                        state.board
+                    ),
+                    promotion: {
+                        index:null,
+                        showDialog: false,
+                    },
+                };
+            }
+            return {...state};
+           
 
         default:
             return { ...state };

@@ -1,17 +1,24 @@
 import { useAppContext } from '@/context/board-context'
-import { Square } from '@/model/types'
-import React from 'react'
+import { PieceName, Square } from '@/model/types'
+import React, { useEffect, useState } from 'react'
 import Block from './Block'
 import { nextChar } from '@/helpers/ui'
 import Dialog from './Dialog'
+import { socket } from '@/model/socket'
+import { PromotionPieces } from '@/model/data'
 
 
-const Board = ({className}: {className?:string}) => {
-    const { state, movePiece, newGame } = useAppContext()
+const Board = ({ className }: { className?: string }) => {
+    const [selectedPiece, setSelectedPiece] = useState<PieceName>('QUEEN')
+    const { state, movePiece, newGame, updateGame, promotoPawn } = useAppContext()
 
-    const handleClick = (block: Square) => {
-        movePiece(block)
-    }
+    const handleClick = (block: Square) => movePiece(block)
+
+    // useEffect(()=>{
+    //     socket.on('gameUpdate', ({from,to})=> {
+    //         updateGame({from,to})
+    //     })
+    // },[socket])
 
 
     return (
@@ -61,6 +68,20 @@ const Board = ({className}: {className?:string}) => {
                 <div className='flex flex-col gap-4 justify-center items-center'>
                     <h1 className='font-bold text-xl'>{state.winner} Win!</h1>
                     <button onClick={newGame} className='px-4 py-2 mb-2 bg-slate-600 text-white w-full'>New Game</button>
+                </div>
+            </Dialog>
+
+            
+            <Dialog isOpen={state.promotion.showDialog} onClose={() => {}}>
+                <div className='flex flex-col gap-4 justify-center items-center'>
+                    <div className='flex gap-2'>
+                        {PromotionPieces[state.currentPlayer === "black" ? "white": "black"].map(piece => (
+                            <div onClick={() => setSelectedPiece(piece.value)} key={piece.value} className={`w-[100px] h-[100px] object-contain cursor-pointer ${selectedPiece === piece.value ? "bg-slate-200" : ""}`}>
+                                <img src={piece.img} alt={piece.value} />
+                            </div>
+                        ))}
+                    </div>
+                    <button onClick={() => promotoPawn(selectedPiece)} className='px-4 py-2 mb-2 bg-slate-600 text-white w-full'>Confirm</button>
                 </div>
             </Dialog>
         </>

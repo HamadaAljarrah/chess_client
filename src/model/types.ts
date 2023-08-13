@@ -2,7 +2,7 @@ import { Piece } from "./piece";
 
 export type Color = "white" | "black";
 
-export type Winner = 'White' | 'Black' | null;
+export type Winner = "White" | "Black" | null;
 
 export type Index = {
     x: number;
@@ -15,5 +15,11 @@ export interface Square {
     index: Index;
     availibale: boolean;
     focus: boolean;
-    danger: boolean
+    danger: boolean;
+}
+
+export type PieceName = "QUEEN" | "ROOK" | "BISHOP" | "KNIGHT";
+export interface PawnPromotion{
+    showDialog: boolean,
+    index: Index | null
 }
