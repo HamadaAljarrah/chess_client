@@ -20,9 +20,9 @@ export default function Home() {
     }
 
     return (
-        <div className="flex flex-col lg:flex-row pt-4 gap-8  justify-center items-center lg:items-start">
-            <Board className="w-full lg:w-[80%]" />
-            <Movement className="w-full lg:w-[20%]" />
+        <div className="flex flex-col lg:flex-row gap-2  justify-center items-center lg:items-start">
+            <Board />
+            <Movement />
         </div>
     );
 }

@@ -5,6 +5,9 @@ import Block from './Block'
 import Dialog from './Dialog'
 import { PromotionPieces } from '@/model/data'
 
+const chars = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+const nums = [8,7,6,5,4,3,2,1]
+
 
 const Board = ({ className }: { className?: string }) => {
     const [selectedPiece, setSelectedPiece] = useState<PieceName>('QUEEN')
@@ -13,23 +16,33 @@ const Board = ({ className }: { className?: string }) => {
 
     return (
         <>
-            <div className={`grid grid-cols-8 gap-0 w-full max-w-[800px] border-slate-800 border-[2px] box-content ${state.self === 'black' ? "rotate-180" : ""} ${className}`}>
-                {state.board.map((row, rowIdx) => {
-                    return row.map((col, colIdx) => {
-                        return (
-                            <Block
-                                key={colIdx + "-" + rowIdx}
-                                routate={rowIdx === 0 || rowIdx === 1}
-                                onClick={(block: Square) => movePiece(block)}
-                                block={col}
-                                src={col.piece?.img}
-                                className={`${state.self === 'black' ? "rotate-180" : ""}`}
-                            />
-                        )
-                    })
-                }
-                )}
+            <div className='bg-slate-300 px-6 relative'>
+                <div className={`grid grid-cols-8 gap-0 w-full max-w-[800px] box-content ${state.self === 'black' ? "rotate-180" : ""} ${className}`}>
+                    {chars.map((char, i) => <div key={i + char} className='text-center'>{char}</div>)}
+                    {state.board.map((row, rowIdx) => {
+                        return row.map((col, colIdx) => {
+                            return (
+                                <div className='relative'>
+                                    {colIdx === 0 && <div className='absolute bottom-1/2 translate-y-1/2 -left-4'>{nums[rowIdx]}</div>}
+                                    {colIdx === 7 && <div className='absolute bottom-1/2 translate-y-1/2  -right-4'>{nums[rowIdx]}</div>}
+                                    <Block
+                                        key={colIdx + "-" + rowIdx}
+                                        routate={rowIdx === 0 || rowIdx === 1}
+                                        onClick={(block: Square) => movePiece(block)}
+                                        block={col}
+                                        src={col.piece?.img}
+                                        className={`${state.self === 'black' ? "rotate-180" : ""}`}
+                                    />
+                                </div>
+
+                            )
+                        })
+                    }
+                    )}
+                    {chars.map((char, i) => <div key={char + i} className='text-center'>{char}</div>)}
+                </div>
             </div>
+
             <Dialog isOpen={state.winner !== null} onClose={newGame}>
                 <div className='flex flex-col gap-4 justify-center items-center'>
                     <h1 className='font-bold text-xl'>{state.winner} Win!</h1>
