@@ -19,7 +19,13 @@ export interface Square {
 }
 
 export type PieceName = "QUEEN" | "ROOK" | "BISHOP" | "KNIGHT";
-export interface PawnPromotion{
-    showDialog: boolean,
-    index: Index | null
+export interface PawnPromotion {
+    showDialog: boolean;
+    index: Index | null;
+}
+
+export interface Move {
+    from: Index;
+    to: Index;
+    player: Color;
 }

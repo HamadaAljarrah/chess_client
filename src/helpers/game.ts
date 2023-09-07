@@ -244,21 +244,19 @@ export const promotePawn = (piece:PieceName, index:Index, color:Color, board:Squ
             const {x,y} = index;
             switch (piece) {
                 case 'BISHOP':
-                    copy[y][x].piece = new Bishop(color,{x,y});
+                    copy[y][x].piece = new Bishop(color,index);
                 break;
 
                 case 'KNIGHT':
-                    copy[y][x].piece =  new Knight(color,{x,y});
+                    copy[y][x].piece =  new Knight(color,index);
                 break;
 
-                case 'QUEEN':
-                    console.log("Is here");
-                    
-                    copy[y][x].piece = new Queen(color,{x,y});
+                case 'QUEEN':                    
+                    copy[y][x].piece = new Queen(color,index);
                 break;
 
                 case 'ROOK':
-                    copy[y][x].piece = new Rook(color,{x,y}, false);
+                    copy[y][x].piece = new Rook(color,index, false);
                 break;
             
                 default:

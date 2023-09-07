@@ -9,11 +9,14 @@ import {
 } from "@/helpers/game";
 import { AppActions, AppState } from "./board-context";
 import { clearPossibleMoves, showPossibleMoves } from "@/helpers/ui";
-import { PawnPromotion, Winner } from "@/model/types";
-import { socket } from "../model/socket";
+import { Winner } from "@/model/types";
+import { socket } from "@/helpers/socket";
 
 export const reducer = (state: AppState, actions: AppActions): AppState => {
     switch (actions.type) {
+        case "CHOSE_COLOR":
+            return { ...state, self:actions.payload.color };
+
         case "MOVE_PIECE":
             const payloadBlock = actions.payload.block;
             const currentBlock = state.currentBlock;
@@ -22,7 +25,8 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
             if (
                 !currentBlock &&
                 payloadBlock.piece &&
-                state.currentPlayer !== payloadBlock.piece.color
+                (state.currentPlayer !== payloadBlock.piece.color || 
+                state.currentPlayer !== state.self)
             ) {
                 return { ...state, currentBlock: null };
             }
@@ -99,11 +103,11 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
                     ),
                 ];
 
-                // Check Pawn promotion                
-                const promotion = pawnPromotion(state.currentPlayer,board)
-
+                // Check Pawn promotion
+                const promotion = pawnPromotion(state.currentPlayer, board);
 
                 // Switch player
+                const previousPlayer = state.currentPlayer;
                 const currentPlayer =
                     state.currentPlayer === "white" ? "black" : "white";
 
@@ -113,10 +117,11 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
                     winner = currentPlayer === "white" ? "Black" : "White";
                 }
 
-                // Broadcast move
+                //Broadcast move
                 socket.emit("sendMove", {
                     from: currentBlock.index,
                     to: payloadBlock.index,
+                    player: previousPlayer,
                 });
 
                 return {
@@ -137,39 +142,36 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
                 currentPlayer: "white",
                 history: [],
                 winner: null,
+                self: null,
                 promotion: {
                     index: null,
-                    showDialog: false
-                }
+                    showDialog: false,
+                },
             };
 
         case "GAME_UPDATE":
-            const { from, to } = actions.payload;
+            const { from, to, player } = actions.payload.move;
             const board = stimulateMove(from, to, state.board);
-            const currentPlayer =
-                state.currentPlayer === "white" ? "black" : "white";
+            const currentPlayer = player === "white" ? "black" : "white";
             return { ...state, board, currentPlayer, currentBlock: null };
 
-
-
         case "PROMOTE_PAWN":
-            if(state.promotion.index){
+            if (state.promotion.index) {
                 return {
                     ...state,
                     board: promotePawn(
                         actions.payload.piece,
                         state.promotion.index,
-                        state.currentPlayer === 'black' ? 'white':'black',
+                        state.currentPlayer === "black" ? "white" : "black",
                         state.board
                     ),
                     promotion: {
-                        index:null,
+                        index: null,
                         showDialog: false,
                     },
                 };
             }
-            return {...state};
-           
+            return { ...state };
 
         default:
             return { ...state };

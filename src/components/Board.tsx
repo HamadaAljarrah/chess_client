@@ -1,11 +1,11 @@
 import { useAppContext } from '@/context/board-context'
-import { PieceName, Square } from '@/model/types'
+import { Move, PieceName, Square } from '@/model/types'
 import React, { useEffect, useState } from 'react'
 import Block from './Block'
 import { nextChar } from '@/helpers/ui'
 import Dialog from './Dialog'
-import { socket } from '@/model/socket'
 import { PromotionPieces } from '@/model/data'
+import { socket } from '@/helpers/socket'
 
 
 const Board = ({ className }: { className?: string }) => {
@@ -14,16 +14,19 @@ const Board = ({ className }: { className?: string }) => {
 
     const handleClick = (block: Square) => movePiece(block)
 
-    // useEffect(()=>{
-    //     socket.on('gameUpdate', ({from,to})=> {
-    //         updateGame({from,to})
-    //     })
-    // },[socket])
+    useEffect(() => {
+        socket.on('gameUpdate', (data: Move) => {                        
+            updateGame(data)
+        })
+    }, [socket])
+ 
+    
+
 
 
     return (
         <>
-            <div className={`grid grid-cols-8 gap-0 px- border-slate-800 border-[2px] box-content ${className}`}>
+            <div className={`grid grid-cols-8 gap-0 px- border-slate-800 border-[2px] box-content ${state.self === 'black'? "rotate-180": ""} ${className}`}>
                 {state.board.map((row, rowIdx) => {
                     let char = "@"
                     return row.map((col, colIdx) => {
@@ -57,6 +60,7 @@ const Board = ({ className }: { className?: string }) => {
                                     onClick={handleClick}
                                     block={col}
                                     src={col.piece?.img}
+                                    className={`${state.self === 'black'? "rotate-180": ""}`}
                                 />
                             </div>
                         )
@@ -71,11 +75,11 @@ const Board = ({ className }: { className?: string }) => {
                 </div>
             </Dialog>
 
-            
-            <Dialog isOpen={state.promotion.showDialog} onClose={() => {}}>
+
+            <Dialog isOpen={state.promotion.showDialog} onClose={() => { }}>
                 <div className='flex flex-col gap-4 justify-center items-center'>
                     <div className='flex gap-2'>
-                        {PromotionPieces[state.currentPlayer === "black" ? "white": "black"].map(piece => (
+                        {PromotionPieces[state.currentPlayer === 'white' ? 'black' : 'white'].map(piece => (
                             <div onClick={() => setSelectedPiece(piece.value)} key={piece.value} className={`w-[100px] h-[100px] object-contain cursor-pointer ${selectedPiece === piece.value ? "bg-slate-200" : ""}`}>
                                 <img src={piece.img} alt={piece.value} />
                             </div>

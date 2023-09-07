@@ -18,7 +18,7 @@ const Movement = ({className}: {className?:string}) => {
       }, [state.history]);
 
     return (
-        <div className={`px-2 flex flex-col gap-2 ${className}`}>            
+        <div className={`px-2 flex flex-col gap-2 min-w-fit ${className}`}>            
             <div  ref={scrollableRef} className=' h-64 overflow-auto'>
                 {state.history.map((movement, index) => (
                     <p key={index} className={`

@@ -4,10 +4,11 @@ interface Props {
     block: Square,
     routate?: boolean;
     onClick: (block:Square) => void,
-    src?: string
+    src?: string,
+    className?:string
 }
 
-const Block = ({ onClick, block, src,routate, ...props }: Props) => {
+const Block = ({ onClick, block, src,routate,className, ...props }: Props) => {
 
     const handleClick = () => {
         onClick(block)
@@ -27,7 +28,7 @@ const Block = ({ onClick, block, src,routate, ...props }: Props) => {
                 w-[calc(1/8%)]
                 h-[calc(1/8%)]
                 aspect-square
-                
+                ${className}
             `}>
             {
                 block.availibale &&
