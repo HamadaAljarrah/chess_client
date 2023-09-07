@@ -1,7 +1,8 @@
 import { initBoard } from "@/helpers/game";
 import { Color, Move, PawnPromotion, PieceName, Square, Winner } from "@/model/types";
-import { ReactNode, createContext, useContext, useReducer } from "react";
+import { ReactNode, createContext, useContext, useEffect, useReducer } from "react";
 import { reducer } from "./reducer";
+import { socket } from "@/model/socket";
 
 export type AppActions =
     | { type: 'CHOSE_COLOR', payload: { color: Color } }
@@ -57,12 +58,11 @@ const AppContextProvider = ({ children }: { children: ReactNode }) => {
     const updateGame = (move: Move) => dispatch({ type: "GAME_UPDATE", payload: { move } })
     const choseColor = (color: Color) => dispatch({ type: "CHOSE_COLOR", payload: { color } })
 
-
-    // useEffect(() => {
-    //     socket.on('gameUpdate', (move: Move) => {
-    //         updateGame(move)
-    //     })
-    // }, [socket])
+    useEffect(() => {
+        socket.on('gameUpdate', (data: Move) => {
+            updateGame(data)
+        })
+    }, [socket])
 
 
     return (

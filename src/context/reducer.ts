@@ -10,7 +10,7 @@ import {
 import { AppActions, AppState } from "./board-context";
 import { clearPossibleMoves, showPossibleMoves } from "@/helpers/ui";
 import { Winner } from "@/model/types";
-import { socket } from "@/helpers/socket";
+import { socket } from "@/model/socket";
 
 export const reducer = (state: AppState, actions: AppActions): AppState => {
     switch (actions.type) {
