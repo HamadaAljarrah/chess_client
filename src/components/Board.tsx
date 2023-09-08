@@ -6,7 +6,7 @@ import Dialog from './Dialog'
 import { PromotionPieces } from '@/model/data'
 
 const chars = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
-const nums = [8,7,6,5,4,3,2,1]
+const nums = [8, 7, 6, 5, 4, 3, 2, 1]
 
 
 const Board = ({ className }: { className?: string }) => {
@@ -18,15 +18,15 @@ const Board = ({ className }: { className?: string }) => {
         <>
             <div className='bg-slate-300 px-6 relative'>
                 <div className={`grid grid-cols-8 gap-0 w-full max-w-[800px] box-content ${state.self === 'black' ? "rotate-180" : ""} ${className}`}>
-                    {chars.map((char, i) => <div key={i + char} className='text-center'>{char}</div>)}
+                    {chars.map((char, i) => <div key={i + char} className={`text-center ${state.self === 'black' ? "rotate-180" : ""}`}>{char}</div>)}
                     {state.board.map((row, rowIdx) => {
                         return row.map((col, colIdx) => {
                             return (
-                                <div className='relative'>
-                                    {colIdx === 0 && <div className='absolute bottom-1/2 translate-y-1/2 -left-4'>{nums[rowIdx]}</div>}
-                                    {colIdx === 7 && <div className='absolute bottom-1/2 translate-y-1/2  -right-4'>{nums[rowIdx]}</div>}
+                                <div key={colIdx + "-" + rowIdx} className='relative'>
+                                    {colIdx === 0 && <div className={`absolute bottom-1/2 translate-y-1/2 -left-4 ${state.self === 'black' ? "rotate-180" : ""}`}>{nums[rowIdx]}</div>}
+                                    {colIdx === 7 && <div className={`absolute bottom-1/2  translate-y-1/2  -right-4 ${state.self === 'black' ? "rotate-180" : ""}`}>{nums[rowIdx]}</div>}
                                     <Block
-                                        key={colIdx + "-" + rowIdx}
+                                        
                                         routate={rowIdx === 0 || rowIdx === 1}
                                         onClick={(block: Square) => movePiece(block)}
                                         block={col}
@@ -39,7 +39,7 @@ const Board = ({ className }: { className?: string }) => {
                         })
                     }
                     )}
-                    {chars.map((char, i) => <div key={char + i} className='text-center'>{char}</div>)}
+                    {chars.map((char, i) => <div key={char + i} className={`text-center ${state.self === 'black' ? "rotate-180" : ""}`}>{char}</div>)}
                 </div>
             </div>
 

@@ -6,6 +6,7 @@ import {
     stimulateMove,
     pawnPromotion,
     promotePawn,
+    copyBoard,
 } from "@/helpers/game";
 import { AppActions, AppState } from "./board-context";
 import { clearPossibleMoves, showPossibleMoves } from "@/helpers/ui";
@@ -15,7 +16,10 @@ import { socket } from "@/model/socket";
 export const reducer = (state: AppState, actions: AppActions): AppState => {
     switch (actions.type) {
         case "CHOSE_COLOR":
-            return { ...state, self:actions.payload.color };
+            return { ...state, self: actions.payload.color };
+
+        case "SET_BOARD":
+            return { ...state, board: actions.payload.board };
 
         case "MOVE_PIECE":
             const payloadBlock = actions.payload.block;
@@ -25,8 +29,8 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
             if (
                 !currentBlock &&
                 payloadBlock.piece &&
-                (state.currentPlayer !== payloadBlock.piece.color || 
-                state.currentPlayer !== state.self)
+                (state.currentPlayer !== payloadBlock.piece.color ||
+                    state.currentPlayer !== state.self)
             ) {
                 return { ...state, currentBlock: null };
             }
@@ -155,16 +159,39 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
             const currentPlayer = player === "white" ? "black" : "white";
             return { ...state, board, currentPlayer, currentBlock: null };
 
-        case "PROMOTE_PAWN":
-            if (state.promotion.index) {
+        case "HANDLE_REMOTE_CASTLE":
+            return {
+                ...state,
+                board: stimulateMove(
+                    actions.payload.move.from,
+                    actions.payload.move.to,
+                    state.board
+                ),
+            };
+            case "HANDLE_REMOTE_PROMOTION":
+                const copy = promotePawn(
+                    actions.payload.piece,
+                    actions.payload.index,
+                    actions.payload.color,
+                    state.board
+                );
                 return {
                     ...state,
-                    board: promotePawn(
-                        actions.payload.piece,
-                        state.promotion.index,
-                        state.currentPlayer === "black" ? "white" : "black",
-                        state.board
-                    ),
+                    board:copy,
+                };
+
+        case "PROMOTE_PAWN":
+            if (state.promotion.index) {
+                const board = promotePawn(
+                    actions.payload.piece,
+                    state.promotion.index,
+                    state.currentPlayer === "black" ? "white" : "black",
+                    state.board
+                );
+                socket.emit("promotion", {index:state.promotion.index, color:state.currentPlayer === "black" ? "white" : "black", piece:actions.payload.piece})
+                return {
+                    ...state,
+                    board,
                     promotion: {
                         index: null,
                         showDialog: false,

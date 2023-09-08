@@ -6,6 +6,7 @@ import { Pawn } from "@/model/pieces/pawn";
 import { Queen } from "@/model/pieces/queen";
 import { Rook } from "@/model/pieces/rook";
 import { Piece } from "@/model/piece";
+import { socket } from "@/model/socket";
 
 export const initBoard = (): Square[][] => {
     const board: Square[][] = [];
@@ -106,9 +107,9 @@ export const castle = (
     const copy = copyBoard(board);
     const rook = copy[y][rookXIndex].piece;
     const king = copy[y][kingXIndex].piece;
+    const destKingXIndex = rookXIndex === 7 ? 6 : 2;
+    const destRookXIndex = rookXIndex === 7 ? 5 : 3;
     if (rook && king) {
-        const destKingXIndex = rookXIndex === 7 ? 6 : 2;
-        const destRookXIndex = rookXIndex === 7 ? 5 : 3;
         const rookClone = rook.clone();
         const kingClone = king.clone();
         rookClone.index = { x: destRookXIndex, y };
@@ -118,7 +119,8 @@ export const castle = (
         copy[y][destKingXIndex].piece = kingClone; // Put the king clone
         copy[y][destRookXIndex].piece = rookClone; // Put the rook clone
     }
-
+    // This is only for rook, king movement broadcast is handled in reducer
+    socket.emit('castle', {from:{x:rookXIndex, y:y}, to:{x:destRookXIndex, y:y, player:color}})
     return copy;
 };
 
