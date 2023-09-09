@@ -7,6 +7,7 @@ import {
     pawnPromotion,
     promotePawn,
     copyBoard,
+    playSound,
 } from "@/helpers/game";
 import { AppActions, AppState } from "./board-context";
 import { clearPossibleMoves, showPossibleMoves } from "@/helpers/ui";
@@ -95,6 +96,9 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
                     state.board
                 );
 
+                // Play sound
+                playSound("move.mp3")
+
                 // Clear possible moves
                 board = clearPossibleMoves(board);
 
@@ -126,6 +130,7 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
                     from: currentBlock.index,
                     to: payloadBlock.index,
                     player: previousPlayer,
+                    isCheckmate: winner !== null,
                 });
 
                 return {
@@ -154,10 +159,18 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
             };
 
         case "GAME_UPDATE":
-            const { from, to, player } = actions.payload.move;
+            const { from, to, player, isCheckmate } = actions.payload.move;
             const board = stimulateMove(from, to, state.board);
+            let winner:Winner = null;
+            if(isCheckmate){
+                winner = state.self === "white" ? "Black" : "White";
+                playSound("checkmate.mp3")
+
+            } else {
+                playSound("move.mp3")
+            }
             const currentPlayer = player === "white" ? "black" : "white";
-            return { ...state, board, currentPlayer, currentBlock: null };
+            return { ...state, board, currentPlayer, currentBlock: null, winner };
 
         case "HANDLE_REMOTE_CASTLE":
             return {
@@ -168,17 +181,17 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
                     state.board
                 ),
             };
-            case "HANDLE_REMOTE_PROMOTION":
-                const copy = promotePawn(
-                    actions.payload.piece,
-                    actions.payload.index,
-                    actions.payload.color,
-                    state.board
-                );
-                return {
-                    ...state,
-                    board:copy,
-                };
+        case "HANDLE_REMOTE_PROMOTION":
+            const copy = promotePawn(
+                actions.payload.data.piece,
+                actions.payload.data.index,
+                actions.payload.data.color,
+                state.board
+            );
+            return {
+                ...state,
+                board: copy,
+            };
 
         case "PROMOTE_PAWN":
             if (state.promotion.index) {
@@ -188,7 +201,11 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
                     state.currentPlayer === "black" ? "white" : "black",
                     state.board
                 );
-                socket.emit("promotion", {index:state.promotion.index, color:state.currentPlayer === "black" ? "white" : "black", piece:actions.payload.piece})
+                socket.emit("promotion", {
+                    index: state.promotion.index,
+                    color: state.currentPlayer === "black" ? "white" : "black",
+                    piece: actions.payload.piece,
+                });
                 return {
                     ...state,
                     board,

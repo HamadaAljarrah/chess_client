@@ -44,8 +44,8 @@ const Board = ({ className }: { className?: string }) => {
             </div>
 
             <Dialog isOpen={state.winner !== null} onClose={newGame}>
-                <div className='flex flex-col gap-4 justify-center items-center'>
-                    <h1 className='font-bold text-xl'>{state.winner} Win!</h1>
+                <div className='flex flex-col p-4 gap-8 justify-center items-center'>
+                    <h1 className='font-bold text-6xl'>{state.winner} Won!</h1>
                     <button onClick={newGame} className='px-4 py-2 mb-2 bg-slate-600 text-white w-full'>New Game</button>
                 </div>
             </Dialog>

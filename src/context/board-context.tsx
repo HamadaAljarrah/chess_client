@@ -1,5 +1,5 @@
 import { copyBoard, initBoard, stimulateMove } from "@/helpers/game";
-import { Color, Index, Move, PawnPromotion, PieceName, Square, Winner } from "@/model/types";
+import { Color, Index, Move, PawnPromotion, PieceName, RemoteCastle, Square, Winner } from "@/model/types";
 import { ReactNode, createContext, useContext, useEffect, useReducer } from "react";
 import { reducer } from "./reducer";
 import { socket } from "@/model/socket";
@@ -11,7 +11,7 @@ export type AppActions =
     | { type: 'GAME_UPDATE', payload: { move: Move } }
     | { type: 'SET_BOARD', payload: { board: Square[][] } }
     | { type: 'HANDLE_REMOTE_CASTLE', payload: { move: Move } }
-    | { type: 'HANDLE_REMOTE_PROMOTION', payload: { color: Color, index: Index, piece: PieceName } }
+    | { type: 'HANDLE_REMOTE_PROMOTION', payload: { data: RemoteCastle } }
     | { type: 'NEW_GAME' }
 
 
@@ -47,7 +47,7 @@ export interface AppContext {
     choseColor: (color: Color) => void,
     updateGame: (move: Move) => void
     handleRemoteCastle: (move: Move) => void
-    handleRemotePromotion: ({color,index,piece}:{color: Color, index: Index, piece: PieceName}) => void
+    handleRemotePromotion: (data: RemoteCastle) => void
     setBoard: (board: Square[][]) => void
 
 }
@@ -66,7 +66,7 @@ const AppContextProvider = ({ children }: { children: ReactNode }) => {
     const handleRemoteCastle = (move: Move) => dispatch({ type: "HANDLE_REMOTE_CASTLE", payload: { move } })
     const choseColor = (color: Color) => dispatch({ type: "CHOSE_COLOR", payload: { color } })
     const setBoard = (board: Square[][]) => dispatch({ type: "SET_BOARD", payload: { board } })
-    const handleRemotePromotion = ({color,index,piece}:{color: Color, index: Index, piece: PieceName}) => dispatch({ type: "HANDLE_REMOTE_PROMOTION", payload: { color, index, piece } })
+    const handleRemotePromotion = (data: RemoteCastle) => dispatch({ type: "HANDLE_REMOTE_PROMOTION", payload: { data } })
 
 
     useEffect(() => {
@@ -76,15 +76,25 @@ const AppContextProvider = ({ children }: { children: ReactNode }) => {
         socket.on('castle', (data: Move) => {
             handleRemoteCastle(data);
         })
-        socket.on('promotion', ({color,index,piece}:{color: Color, index: Index, piece: PieceName}) => {            
-            handleRemotePromotion({color, index, piece});
+        socket.on('promotion', (data: RemoteCastle) => {
+            handleRemotePromotion(data);
         })
 
     }, [socket])
 
 
     return (
-        <appContext.Provider value={{ state, movePiece, newGame, promotoPawn, choseColor, updateGame, handleRemoteCastle, handleRemotePromotion, setBoard }}>
+        <appContext.Provider value={{
+            state,
+            movePiece,
+            newGame,
+            promotoPawn,
+            choseColor,
+            updateGame,
+            handleRemoteCastle,
+            handleRemotePromotion,
+            setBoard
+        }}>
             {children}
         </appContext.Provider>
     )

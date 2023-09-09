@@ -120,7 +120,10 @@ export const castle = (
         copy[y][destRookXIndex].piece = rookClone; // Put the rook clone
     }
     // This is only for rook, king movement broadcast is handled in reducer
-    socket.emit('castle', {from:{x:rookXIndex, y:y}, to:{x:destRookXIndex, y:y, player:color}})
+    socket.emit("castle", {
+        from: { x: rookXIndex, y: y },
+        to: { x: destRookXIndex, y: y, player: color },
+    });
     return copy;
 };
 
@@ -165,7 +168,7 @@ export const isMoveSafe = (
     board: Square[][]
 ): boolean => {
     // Simulate the move on a temporary board
-    const copy = stimulateMove(piece.index, dest,board)
+    const copy = stimulateMove(piece.index, dest, board);
 
     // Find the king's position
     const kingPosition = getKingIndex(piece.color, copy);
@@ -177,7 +180,10 @@ export const isMoveSafe = (
             const opponentPiece = col.piece;
             if (opponentPiece && opponentPiece.color === opponentColor) {
                 const validMoves = opponentPiece.getValidMoves(copy);
-                if (validMoves.some((validMove) =>isSameIndex(validMove, kingPosition))
+                if (
+                    validMoves.some((validMove) =>
+                        isSameIndex(validMove, kingPosition)
+                    )
                 ) {
                     return false; // Move exposes king to check
                 }
@@ -188,21 +194,19 @@ export const isMoveSafe = (
     return true; // Move is safe
 };
 
-export const stimulateMove = (src:Index, dest:Index,board:Square[][])=>{
-
+export const stimulateMove = (src: Index, dest: Index, board: Square[][]) => {
     const copy = copyBoard(board);
-    
+
     const piece = board[src.y][src.x].piece;
-    if(piece){
+    if (piece) {
         const newPiece = piece.clone();
         newPiece.index = { x: dest.x, y: dest.y };
         copy[dest.y][dest.x].piece = newPiece;
         copy[src.y][src.x].piece = null;
     }
 
-
     return copy;
-}
+};
 
 export const getNumOfSafeMove = (color: Color, board: Square[][]): number => {
     let possible = 0;
@@ -217,9 +221,7 @@ export const getNumOfSafeMove = (color: Color, board: Square[][]): number => {
                     .some((index) => isMoveSafe(piece, index, board))
             ) {
                 piece.getValidMoves(board).forEach((index) => {
-                    if (
-                        isMoveSafe(piece, index, board)
-                    ) {
+                    if (isMoveSafe(piece, index, board)) {
                         possible++;
                     }
                 });
@@ -229,40 +231,55 @@ export const getNumOfSafeMove = (color: Color, board: Square[][]): number => {
     return possible;
 };
 
-export const pawnPromotion = (color:Color, board:Square[][]): PawnPromotion =>{
-    const indexY = color === 'white' ? 0 : 7 ;
+export const pawnPromotion = (
+    color: Color,
+    board: Square[][]
+): PawnPromotion => {
+    const indexY = color === "white" ? 0 : 7;
 
-    for(const col of board[indexY]){
-        if(col.piece instanceof Pawn){
-            return ({index: {...col.index}, showDialog: true})
+    for (const col of board[indexY]) {
+        if (col.piece instanceof Pawn) {
+            return { index: { ...col.index }, showDialog: true };
         }
     }
 
-    return ({index: null, showDialog: false})
-}
+    return { index: null, showDialog: false };
+};
 
-export const promotePawn = (piece:PieceName, index:Index, color:Color, board:Square[][]): Square[][]=>{
-            const copy = copyBoard(board);
-            const {x,y} = index;
-            switch (piece) {
-                case 'BISHOP':
-                    copy[y][x].piece = new Bishop(color,index);
-                break;
+export const promotePawn = (
+    piece: PieceName,
+    index: Index,
+    color: Color,
+    board: Square[][]
+): Square[][] => {
+    const copy = copyBoard(board);
+    const { x, y } = index;
+    switch (piece) {
+        case "BISHOP":
+            copy[y][x].piece = new Bishop(color, index);
+            break;
 
-                case 'KNIGHT':
-                    copy[y][x].piece =  new Knight(color,index);
-                break;
+        case "KNIGHT":
+            copy[y][x].piece = new Knight(color, index);
+            break;
 
-                case 'QUEEN':                    
-                    copy[y][x].piece = new Queen(color,index);
-                break;
+        case "QUEEN":
+            copy[y][x].piece = new Queen(color, index);
+            break;
 
-                case 'ROOK':
-                    copy[y][x].piece = new Rook(color,index, false);
-                break;
-            
-                default:
-                    break;
-            }
+        case "ROOK":
+            copy[y][x].piece = new Rook(color, index, false);
+            break;
+
+        default:
+            break;
+    }
     return copy;
-}
+};
+
+export const playSound = (path: string) => {
+    const audio = new Audio(path);
+    if (audio) {
+        audio.play();
+    }
+};

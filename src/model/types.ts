@@ -28,4 +28,11 @@ export interface Move {
     from: Index;
     to: Index;
     player: Color;
+    isCheckmate: boolean;
+}
+
+export interface RemoteCastle {
+    color: Color, 
+    index: Index, 
+    piece: PieceName 
 }
