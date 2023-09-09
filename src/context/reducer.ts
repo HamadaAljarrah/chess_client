@@ -97,19 +97,22 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
                 );
 
                 // Play sound
-                playSound("move.mp3")
+                playSound("move.mp3");
 
                 // Clear possible moves
                 board = clearPossibleMoves(board);
 
                 // Update history
+                const movementHistory = createMovementString(
+                    currentBlock.index,
+                    payloadBlock.index
+                )
                 const history = [
                     ...state.history,
-                    createMovementString(
-                        currentBlock.index,
-                        payloadBlock.index
-                    ),
+                    movementHistory
                 ];
+
+                socket.emit("history", movementHistory)
 
                 // Check Pawn promotion
                 const promotion = pawnPromotion(state.currentPlayer, board);
@@ -161,16 +164,21 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
         case "GAME_UPDATE":
             const { from, to, player, isCheckmate } = actions.payload.move;
             const board = stimulateMove(from, to, state.board);
-            let winner:Winner = null;
-            if(isCheckmate){
+            let winner: Winner = null;
+            if (isCheckmate) {
                 winner = state.self === "white" ? "Black" : "White";
-                playSound("checkmate.mp3")
-
+                playSound("checkmate.mp3");
             } else {
-                playSound("move.mp3")
+                playSound("move.mp3");
             }
             const currentPlayer = player === "white" ? "black" : "white";
-            return { ...state, board, currentPlayer, currentBlock: null, winner };
+            return {
+                ...state,
+                board,
+                currentPlayer,
+                currentBlock: null,
+                winner,
+            };
 
         case "HANDLE_REMOTE_CASTLE":
             return {
@@ -180,6 +188,12 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
                     actions.payload.move.to,
                     state.board
                 ),
+            };
+        case "HANDLE_REMOTE_HISTORY":
+            
+            return {
+                ...state,
+                history: [...state.history, actions.payload.data]
             };
         case "HANDLE_REMOTE_PROMOTION":
             const copy = promotePawn(

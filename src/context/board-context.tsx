@@ -10,6 +10,7 @@ export type AppActions =
     | { type: 'PROMOTE_PAWN', payload: { piece: PieceName } }
     | { type: 'GAME_UPDATE', payload: { move: Move } }
     | { type: 'SET_BOARD', payload: { board: Square[][] } }
+    | { type: 'HANDLE_REMOTE_HISTORY', payload: { data: string } }
     | { type: 'HANDLE_REMOTE_CASTLE', payload: { move: Move } }
     | { type: 'HANDLE_REMOTE_PROMOTION', payload: { data: RemoteCastle } }
     | { type: 'NEW_GAME' }
@@ -48,6 +49,7 @@ export interface AppContext {
     updateGame: (move: Move) => void
     handleRemoteCastle: (move: Move) => void
     handleRemotePromotion: (data: RemoteCastle) => void
+    handleRemoteHistory: (data: string) => void
     setBoard: (board: Square[][]) => void
 
 }
@@ -67,6 +69,8 @@ const AppContextProvider = ({ children }: { children: ReactNode }) => {
     const choseColor = (color: Color) => dispatch({ type: "CHOSE_COLOR", payload: { color } })
     const setBoard = (board: Square[][]) => dispatch({ type: "SET_BOARD", payload: { board } })
     const handleRemotePromotion = (data: RemoteCastle) => dispatch({ type: "HANDLE_REMOTE_PROMOTION", payload: { data } })
+    const handleRemoteHistory = (data: string) => dispatch({ type: "HANDLE_REMOTE_HISTORY", payload: { data } })
+
 
 
     useEffect(() => {
@@ -78,6 +82,9 @@ const AppContextProvider = ({ children }: { children: ReactNode }) => {
         })
         socket.on('promotion', (data: RemoteCastle) => {
             handleRemotePromotion(data);
+        })
+        socket.on('history', (data: string) => {
+            handleRemoteHistory(data);
         })
 
     }, [socket])
@@ -93,6 +100,7 @@ const AppContextProvider = ({ children }: { children: ReactNode }) => {
             updateGame,
             handleRemoteCastle,
             handleRemotePromotion,
+            handleRemoteHistory,
             setBoard
         }}>
             {children}

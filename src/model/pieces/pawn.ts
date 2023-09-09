@@ -35,7 +35,8 @@ export class Pawn extends Piece {
             ];
             for (const move of firstPossibleMoves) {
                 const [newX, newY] = [x + move.dx, y + move.dy];
-                if (inBoundary(newX, newY) && !board[newY][newX].piece) {
+
+                if (inBoundary(newX, newY) && !board[newY][newX].piece && !board[newY - yAxisDirection][newX ].piece) {
                     indexes.push({ x: newX, y: newY });
                 }
             }
