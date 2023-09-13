@@ -98,6 +98,7 @@ export const inBoundary = (x: number, y: number) => {
 export const castle = (
     dest: Index,
     color: Color,
+    channel:string,
     board: Square[][]
 ): Square[][] => {
     const rookXIndex = dest.x === 6 ? 7 : 0;
@@ -123,6 +124,7 @@ export const castle = (
     socket.emit("castle", {
         from: { x: rookXIndex, y: y },
         to: { x: destRookXIndex, y: y, player: color },
+        channel
     });
     return copy;
 };

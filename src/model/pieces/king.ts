@@ -78,13 +78,13 @@ export class King extends Piece {
         return indexes;
     }
 
-    public makeMove(dest: Index, board: Square[][]): Square[][] {
+    public makeMove(dest: Index, board: Square[][], channel:string): Square[][] {
         this.firstMove = false;
         const castling = Math.abs(dest.x - this.index.x) === 2;
         if (castling) {
-            return castle(dest, this.color, board);
+            return castle(dest, this.color, channel,board);
         } else {
-            return super.makeMove(dest, board);
+            return super.makeMove(dest, board, channel);
         }
     }
 }

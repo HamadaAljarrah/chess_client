@@ -18,7 +18,7 @@ export abstract class Piece {
         this.points = points;
     }
 
-    public makeMove(dest: Index, board: Square[][]): Square[][] {
+    public makeMove(dest: Index, board: Square[][],channel:string): Square[][] {
         
         const copy = copyBoard(board);
         const newPiece = this.clone();

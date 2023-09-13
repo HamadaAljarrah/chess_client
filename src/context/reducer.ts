@@ -96,7 +96,9 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
                 // Update board with move
                 let board = currentBlock.piece.makeMove(
                     payloadBlock.index,
-                    state.board
+                    state.board,
+                    state.channel || ""
+
                 );
 
                 // Clac points
@@ -199,7 +201,7 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
                 board: stimulateMove(
                     actions.payload.move.from,
                     actions.payload.move.to,
-                    state.board
+                    state.board,
                 ),
             };
         case "HANDLE_REMOTE_HISTORY":
@@ -231,6 +233,7 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
                     index: state.promotion.index,
                     color: state.currentPlayer === "black" ? "white" : "black",
                     piece: actions.payload.piece,
+                    channel: state.channel
                 });
                 return {
                     ...state,
