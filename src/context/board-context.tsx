@@ -9,6 +9,7 @@ export type AppActions =
     | { type: 'MOVE_PIECE', payload: { block: Square } }
     | { type: 'PROMOTE_PAWN', payload: { piece: PieceName } }
     | { type: 'SET_BOARD', payload: { board: Square[][] } }
+    | { type: 'CALC_POINTS', payload: { board: Square[][] } }
     | { type: 'NEW_GAME' }
     // Server actions
     | { type: 'GAME_UPDATE', payload: { move: RemoteMove } }
@@ -54,6 +55,7 @@ export interface AppContext {
     promotoPawn: (piece: PieceName) => void,
     startGame: (color: Color,channel: string) => void,
     setBoard: (board: Square[][]) => void
+    calcPoints: (board: Square[][]) => void
     updateGame: (move: RemoteMove) => void
     handleRemoteCastle: (move: RemoteMove) => void
     handleRemotePromotion: (data: RemoteCastle) => void
@@ -75,6 +77,7 @@ const AppContextProvider = ({ children }: { children: ReactNode }) => {
     const handleRemoteCastle = (move: RemoteMove) => dispatch({ type: "HANDLE_REMOTE_CASTLE", payload: { move } })
     const startGame = (color: Color, channel:string) => dispatch({ type: "START_GAME", payload: { color,channel } })
     const setBoard = (board: Square[][]) => dispatch({ type: "SET_BOARD", payload: { board } })
+    const calcPoints = (board: Square[][]) => dispatch({ type: "CALC_POINTS", payload: { board } })
     const handleRemotePromotion = (data: RemoteCastle) => dispatch({ type: "HANDLE_REMOTE_PROMOTION", payload: { data } })
     const handleRemoteHistory = (data: string) => dispatch({ type: "HANDLE_REMOTE_HISTORY", payload: { data } })
 
@@ -90,11 +93,15 @@ const AppContextProvider = ({ children }: { children: ReactNode }) => {
         socket.on('promotion', (data: RemoteCastle) => {
             handleRemotePromotion(data);
         })
-        socket.on('history', (data: string) => {
-            handleRemoteHistory(data);
+        socket.on('history', (data: {chennel:string, history:string}) => {
+            handleRemoteHistory(data.history);
         })
 
     }, [socket])
+
+    useEffect(()=>{
+        calcPoints(state.board)
+    },[state.board])
 
 
     return (
@@ -104,11 +111,12 @@ const AppContextProvider = ({ children }: { children: ReactNode }) => {
             newGame,
             promotoPawn,
             startGame,
+            setBoard,
             updateGame,
+            calcPoints,
             handleRemoteCastle,
             handleRemotePromotion,
             handleRemoteHistory,
-            setBoard
         }}>
             {children}
         </appContext.Provider>

@@ -16,14 +16,22 @@ import { socket } from "@/model/socket";
 
 export const reducer = (state: AppState, actions: AppActions): AppState => {
     switch (actions.type) {
-  
+        case "START_GAME":
+            socket.emit("startGame", actions.payload);
 
-        case "START_GAME":       
-            socket.emit("startGame", actions.payload) 
-            return { ...state, self: actions.payload.color, channel: actions.payload.channel };
+            return {
+                ...state,
+                self: actions.payload.color,
+                channel: actions.payload.channel,
+            };
 
         case "SET_BOARD":
             return { ...state, board: actions.payload.board };
+
+        case "CALC_POINTS":
+            const blackPoints = countPoints(state.board, "black");
+            const whitePoints = countPoints(state.board, "white");
+            return { ...state, blackPoints, whitePoints };
 
         case "MOVE_PIECE":
             const payloadBlock = actions.payload.block;
@@ -97,13 +105,8 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
                 let board = currentBlock.piece.makeMove(
                     payloadBlock.index,
                     state.board,
-                    state.channel || ""
-
+                    state.channel || ""
                 );
-
-                // Clac points
-                const blackPoints = countPoints(state.board, "black");
-                const whitePoints = countPoints(state.board, "white");
 
                 // Play sound
                 playSound("move.mp3");
@@ -117,8 +120,6 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
                     payloadBlock.index
                 );
                 const history = [...state.history, movementHistory];
-
-                socket.emit("history", movementHistory);
 
                 // Check Pawn promotion
                 const promotion = pawnPromotion(state.currentPlayer, board);
@@ -134,14 +135,17 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
                     winner = currentPlayer === "white" ? "Black" : "White";
                 }
 
-                
-                //Broadcast move
+                //Broadcast move and history
+                socket.emit("history", {
+                    history: movementHistory,
+                    channel: state.channel,
+                });
                 socket.emit("sendMove", {
                     from: currentBlock.index,
                     to: payloadBlock.index,
                     player: previousPlayer,
                     isCheckmate: winner !== null,
-                    channel: state.channel
+                    channel: state.channel,
                 });
 
                 return {
@@ -152,8 +156,6 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
                     promotion,
                     currentBlock: null,
                     winner,
-                    blackPoints,
-                    whitePoints,
                 };
             }
 
@@ -175,8 +177,6 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
             };
 
         case "GAME_UPDATE":
-            console.log("getting move");
-            
             const { from, to, player, isCheckmate } = actions.payload.move;
             const board = stimulateMove(from, to, state.board);
             let winner: Winner = null;
@@ -201,7 +201,7 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
                 board: stimulateMove(
                     actions.payload.move.from,
                     actions.payload.move.to,
-                    state.board,
+                    state.board
                 ),
             };
         case "HANDLE_REMOTE_HISTORY":
@@ -233,7 +233,7 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
                     index: state.promotion.index,
                     color: state.currentPlayer === "black" ? "white" : "black",
                     piece: actions.payload.piece,
-                    channel: state.channel
+                    channel: state.channel,
                 });
                 return {
                     ...state,
