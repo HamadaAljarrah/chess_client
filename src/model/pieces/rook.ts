@@ -1,5 +1,5 @@
 import { Color, Index, Square } from "../types";
-import { Piece } from "../piece";
+import { Piece } from "./piece";
 import {  inBoundary, isSameIndex } from "@/helpers/game";
 
 export class Rook extends Piece {
@@ -11,7 +11,7 @@ export class Rook extends Piece {
             color === "black"
                 ? "./pieces/BLACK_ROOK.png"
                 : "./pieces/WHITE_ROOK.png";
-        super(color, image, index);
+        super(color, image, index,5);
         this.firstMove = firstMove;
         this.defualtIndex = index;
     }

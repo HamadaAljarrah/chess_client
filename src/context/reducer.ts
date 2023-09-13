@@ -6,8 +6,8 @@ import {
     stimulateMove,
     pawnPromotion,
     promotePawn,
-    copyBoard,
     playSound,
+    countPoints,
 } from "@/helpers/game";
 import { AppActions, AppState } from "./board-context";
 import { clearPossibleMoves, showPossibleMoves } from "@/helpers/ui";
@@ -18,6 +18,9 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
     switch (actions.type) {
         case "CHOSE_COLOR":
             return { ...state, self: actions.payload.color };
+            
+        case "CHOSE_CHANNEL":            
+            return { ...state, channel: actions.payload.channel };
 
         case "SET_BOARD":
             return { ...state, board: actions.payload.board };
@@ -96,6 +99,10 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
                     state.board
                 );
 
+                // Clac points
+                const blackPoints = countPoints(state.board, "black");
+                const whitePoints = countPoints(state.board, "white");
+
                 // Play sound
                 playSound("move.mp3");
 
@@ -106,13 +113,10 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
                 const movementHistory = createMovementString(
                     currentBlock.index,
                     payloadBlock.index
-                )
-                const history = [
-                    ...state.history,
-                    movementHistory
-                ];
+                );
+                const history = [...state.history, movementHistory];
 
-                socket.emit("history", movementHistory)
+                socket.emit("history", movementHistory);
 
                 // Check Pawn promotion
                 const promotion = pawnPromotion(state.currentPlayer, board);
@@ -144,6 +148,8 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
                     promotion,
                     currentBlock: null,
                     winner,
+                    blackPoints,
+                    whitePoints,
                 };
             }
 
@@ -155,10 +161,13 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
                 history: [],
                 winner: null,
                 self: null,
+                channel: null,
                 promotion: {
                     index: null,
                     showDialog: false,
                 },
+                blackPoints: 0,
+                whitePoints: 0,
             };
 
         case "GAME_UPDATE":
@@ -190,10 +199,9 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
                 ),
             };
         case "HANDLE_REMOTE_HISTORY":
-            
             return {
                 ...state,
-                history: [...state.history, actions.payload.data]
+                history: [...state.history, actions.payload.data],
             };
         case "HANDLE_REMOTE_PROMOTION":
             const copy = promotePawn(

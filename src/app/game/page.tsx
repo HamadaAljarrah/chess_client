@@ -10,7 +10,7 @@ export default function Home() {
     const router = useRouter();
 
     useEffect(() => {
-        if (!state.self) {
+        if (!state.self || !state.channel) {
             router.push('/');
         }
     }, [state.self, router]);

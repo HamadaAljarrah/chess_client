@@ -1,5 +1,5 @@
 import { Color, Index, Square } from "../types";
-import { Piece } from "../piece";
+import { Piece } from "./piece";
 import {  inBoundary } from "@/helpers/game";
 
 export class Knight extends Piece {
@@ -8,7 +8,7 @@ export class Knight extends Piece {
             color === "black"
                 ? "./pieces/BLACK_KNIGHT.png"
                 : "./pieces/WHITE_KNIGHT.png";
-        super(color, image, index);
+        super(color, image, index,3);
     }
 
     public clone(): Knight {

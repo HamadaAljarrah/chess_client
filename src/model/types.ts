@@ -1,13 +1,20 @@
-import { Piece } from "./piece";
+import { Piece } from "./pieces/piece";
 
 export type Color = "white" | "black";
 
 export type Winner = "White" | "Black" | null;
 
+export type PieceName = "QUEEN" | "ROOK" | "BISHOP" | "KNIGHT";
+
 export type Index = {
     x: number;
     y: number;
 };
+
+export interface PieceImage {
+    value: PieceName;
+    img: string;
+}
 
 export interface Square {
     color: Color;
@@ -18,13 +25,12 @@ export interface Square {
     danger: boolean;
 }
 
-export type PieceName = "QUEEN" | "ROOK" | "BISHOP" | "KNIGHT";
 export interface PawnPromotion {
     showDialog: boolean;
     index: Index | null;
 }
 
-export interface Move {
+export interface RemoteMove {
     from: Index;
     to: Index;
     player: Color;

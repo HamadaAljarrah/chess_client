@@ -1,6 +1,6 @@
 import { Index, Square } from "@/model/types";
 import { copyBoard, isMoveSafe } from "./game";
-import { Piece } from "@/model/piece";
+import { Piece } from "@/model/pieces/piece";
 
 
 const removePossibleMove = (board:Square[][], indexes:Index[]):Square[][] => {

@@ -1,5 +1,5 @@
 import { Color, Index, Square } from "../types";
-import { Piece } from "../piece";
+import { Piece } from "./piece";
 import { castle, inBoundary } from "@/helpers/game";
 import { Rook } from "./rook";
 
@@ -11,7 +11,7 @@ export class King extends Piece {
             color === "black"
                 ? "./pieces/BLACK_KING.png"
                 : "./pieces/WHITE_KING.png";
-        super(color, image, index);
+        super(color, image, index,0);
         this.firstMove = isFirstMove;
     }
 

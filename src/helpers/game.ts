@@ -5,7 +5,7 @@ import { Knight } from "@/model/pieces/knight";
 import { Pawn } from "@/model/pieces/pawn";
 import { Queen } from "@/model/pieces/queen";
 import { Rook } from "@/model/pieces/rook";
-import { Piece } from "@/model/piece";
+import { Piece } from "@/model/pieces/piece";
 import { socket } from "@/model/socket";
 
 export const initBoard = (): Square[][] => {
@@ -276,6 +276,18 @@ export const promotePawn = (
     }
     return copy;
 };
+
+export const countPoints = (board:Square[][], color:Color):number =>{
+    let points = 0;
+    for(const row of board){
+        for(const square of row){
+            if(square.piece && square.piece.color === color){
+                points+= square.piece.points;
+            }
+        }
+    }
+    return points;
+}
 
 export const playSound = (path: string) => {
     const audio = new Audio(path);

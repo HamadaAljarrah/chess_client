@@ -1,10 +1,6 @@
-import { Color, PieceName } from "./types";
-interface PawnPromotion {
-    value: PieceName;
-    img: string;
-}
+import { Color, PieceImage } from "./types";
 
-export const PromotionPieces: Record<Color,PawnPromotion[]> = {
+export const PromotionPieces: Record<Color,PieceImage[]> = {
     black: [
         {value: 'QUEEN', img: "./pieces/BLACK_QUEEN.png"},
         {value: 'BISHOP', img: "./pieces/BLACK_BISHOP.png"},
