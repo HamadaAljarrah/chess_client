@@ -8,7 +8,7 @@ import { useState } from "react";
 
 const OPTIONS = [
     { label: 'White', value: 'white' },
-    { label: 'Balck', value: 'black' },
+    { label: 'Black', value: 'black' },
 
 ]
 

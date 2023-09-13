@@ -135,6 +135,12 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
                     winner = currentPlayer === "white" ? "Black" : "White";
                 }
 
+                // Handle footprint
+                const footPrint = {
+                    from: { x: currentBlock.index.x, y: currentBlock.index.y },
+                    to: { x: payloadBlock.index.x, y: payloadBlock.index.y },
+                };
+
                 //Broadcast move and history
                 socket.emit("history", {
                     history: movementHistory,
@@ -147,6 +153,13 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
                     isCheckmate: winner !== null,
                     channel: state.channel,
                 });
+                socket.emit("footprint", {
+                    footprint: {
+                        from: currentBlock.index,
+                        to: payloadBlock.index,
+                    },
+                    channel: state.channel,
+                });
 
                 return {
                     ...state,
@@ -156,6 +169,7 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
                     promotion,
                     currentBlock: null,
                     winner,
+                    footPrint,
                 };
             }
 
@@ -174,6 +188,7 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
                 },
                 blackPoints: 0,
                 whitePoints: 0,
+                footPrint: null,
             };
 
         case "GAME_UPDATE":
@@ -219,6 +234,11 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
             return {
                 ...state,
                 board: copy,
+            };
+        case "HANDLE_REMOTE_FOOTPRINT":
+            return {
+                ...state,
+                footPrint: actions.payload.data,
             };
 
         case "PROMOTE_PAWN":

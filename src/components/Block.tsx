@@ -3,12 +3,12 @@ import { Square } from "@/model/types"
 interface Props {
     block: Square,
     routate?: boolean;
-    onClick: (block:Square) => void,
+    onClick: (block: Square) => void,
     src?: string,
-    className?:string
+    className?: string
 }
 
-const Block = ({ onClick, block, src,routate,className, ...props }: Props) => {
+const Block = ({ onClick, block, src, routate, className, ...props }: Props) => {
 
     const handleClick = () => {
         onClick(block)
@@ -50,7 +50,17 @@ const Block = ({ onClick, block, src,routate,className, ...props }: Props) => {
                     opacity-50
                 `} />
             }
-             {
+            {
+                block.footPrint &&
+                <div className={`
+                    absolute
+                    z-0
+                    inset-0
+                    bg-yellow-500
+                    opacity-90
+                `} />
+            }
+            {
                 block.danger &&
                 <div className={`
                     absolute
@@ -60,6 +70,7 @@ const Block = ({ onClick, block, src,routate,className, ...props }: Props) => {
                     opacity-90
                 `} />
             }
+
 
             {src &&
                 <img draggable src={src} alt={src} className={`

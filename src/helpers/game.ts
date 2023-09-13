@@ -23,6 +23,7 @@ export const initBoard = (): Square[][] => {
                 availibale: false,
                 focus: false,
                 danger: false,
+                footPrint: false,
             });
         }
         board.push(row);

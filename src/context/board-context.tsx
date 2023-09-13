@@ -3,9 +3,10 @@ import { Color, Index, RemoteMove, PawnPromotion, PieceName, RemoteCastle, Squar
 import { ReactNode, createContext, useContext, useEffect, useReducer } from "react";
 import { reducer } from "./reducer";
 import { socket } from "@/model/socket";
+import { showFootPrint } from "@/helpers/ui";
 
 export type AppActions =
-    | { type: 'START_GAME', payload: { color: Color,channel: string } }
+    | { type: 'START_GAME', payload: { color: Color, channel: string } }
     | { type: 'MOVE_PIECE', payload: { block: Square } }
     | { type: 'PROMOTE_PAWN', payload: { piece: PieceName } }
     | { type: 'SET_BOARD', payload: { board: Square[][] } }
@@ -16,6 +17,8 @@ export type AppActions =
     | { type: 'HANDLE_REMOTE_HISTORY', payload: { data: string } }
     | { type: 'HANDLE_REMOTE_CASTLE', payload: { move: RemoteMove } }
     | { type: 'HANDLE_REMOTE_PROMOTION', payload: { data: RemoteCastle } }
+    | { type: 'HANDLE_REMOTE_FOOTPRINT', payload: { data: {from:Index,to:Index} } }
+
 
 
 
@@ -30,6 +33,7 @@ export type AppState = {
     promotion: PawnPromotion,
     whitePoints: number,
     blackPoints: number,
+    footPrint: { from: Index, to: Index } | null
 
 }
 export const initialState: AppState = {
@@ -45,7 +49,9 @@ export const initialState: AppState = {
         index: null
     },
     blackPoints: 0,
-    whitePoints: 0
+    whitePoints: 0,
+    footPrint: null
+
 }
 
 export interface AppContext {
@@ -53,13 +59,15 @@ export interface AppContext {
     movePiece: (block: Square) => void,
     newGame: () => void,
     promotoPawn: (piece: PieceName) => void,
-    startGame: (color: Color,channel: string) => void,
+    startGame: (color: Color, channel: string) => void,
     setBoard: (board: Square[][]) => void
     calcPoints: (board: Square[][]) => void
     updateGame: (move: RemoteMove) => void
     handleRemoteCastle: (move: RemoteMove) => void
     handleRemotePromotion: (data: RemoteCastle) => void
     handleRemoteHistory: (data: string) => void
+    handleRemoteFootprint: (data: {from:Index,to:Index}) => void
+
 
 }
 const appContext = createContext<AppContext | undefined>(undefined);
@@ -75,11 +83,12 @@ const AppContextProvider = ({ children }: { children: ReactNode }) => {
     const promotoPawn = (piece: PieceName) => dispatch({ type: "PROMOTE_PAWN", payload: { piece } })
     const updateGame = (move: RemoteMove) => dispatch({ type: "GAME_UPDATE", payload: { move } })
     const handleRemoteCastle = (move: RemoteMove) => dispatch({ type: "HANDLE_REMOTE_CASTLE", payload: { move } })
-    const startGame = (color: Color, channel:string) => dispatch({ type: "START_GAME", payload: { color,channel } })
+    const startGame = (color: Color, channel: string) => dispatch({ type: "START_GAME", payload: { color, channel } })
     const setBoard = (board: Square[][]) => dispatch({ type: "SET_BOARD", payload: { board } })
     const calcPoints = (board: Square[][]) => dispatch({ type: "CALC_POINTS", payload: { board } })
     const handleRemotePromotion = (data: RemoteCastle) => dispatch({ type: "HANDLE_REMOTE_PROMOTION", payload: { data } })
     const handleRemoteHistory = (data: string) => dispatch({ type: "HANDLE_REMOTE_HISTORY", payload: { data } })
+    const handleRemoteFootprint = (data: {from:Index,to:Index}) => dispatch({ type: "HANDLE_REMOTE_FOOTPRINT", payload: { data } })
 
 
 
@@ -93,15 +102,21 @@ const AppContextProvider = ({ children }: { children: ReactNode }) => {
         socket.on('promotion', (data: RemoteCastle) => {
             handleRemotePromotion(data);
         })
-        socket.on('history', (data: {chennel:string, history:string}) => {
+        socket.on('history', (data: { chennel: string, history: string }) => {
             handleRemoteHistory(data.history);
+        })
+        socket.on('footprint', (data) => {
+            handleRemoteFootprint(data.footprint);
         })
 
     }, [socket])
 
-    useEffect(()=>{
+    useEffect(() => {
         calcPoints(state.board)
-    },[state.board])
+        if (state.footPrint) {
+            showFootPrint(state.board, state.footPrint);
+        }
+    }, [state.footPrint, state.board])
 
 
     return (
@@ -117,6 +132,7 @@ const AppContextProvider = ({ children }: { children: ReactNode }) => {
             handleRemoteCastle,
             handleRemotePromotion,
             handleRemoteHistory,
+            handleRemoteFootprint
         }}>
             {children}
         </appContext.Provider>

@@ -23,6 +23,7 @@ export interface Square {
     availibale: boolean;
     focus: boolean;
     danger: boolean;
+    footPrint: boolean,
 }
 
 export interface PawnPromotion {

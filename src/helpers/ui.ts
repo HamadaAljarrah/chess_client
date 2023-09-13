@@ -2,19 +2,38 @@ import { Index, Square } from "@/model/types";
 import { copyBoard, isMoveSafe } from "./game";
 import { Piece } from "@/model/pieces/piece";
 
-
-const removePossibleMove = (board:Square[][], indexes:Index[]):Square[][] => {
-    for(const index of indexes){
+const removePossibleMove = (
+    board: Square[][],
+    indexes: Index[]
+): Square[][] => {
+    for (const index of indexes) {
         board[index.y][index.x].availibale = false;
         board[index.y][index.x].danger = false;
-
     }
-    return board
-}
+    return board;
+};
 
+export const showFootPrint = (
+    board: Square[][],
+    indexes: { from: Index; to: Index }
+): Square[][] => {
+    for (let row of board) {
+        for (let block of row) {
+            if (block.footPrint) {
+                block.footPrint = false;
+            }
+        }
+    }
+    board[indexes.from.y][indexes.from.x].footPrint = true;
+    board[indexes.to.y][indexes.to.x].footPrint = true;
 
+    return board;
+};
 
-export const showPossibleMoves = (piece: Piece,board: Square[][]): Square[][] => {
+export const showPossibleMoves = (
+    piece: Piece,
+    board: Square[][]
+): Square[][] => {
     let copy = copyBoard(board);
     const possibleMoves = piece.getValidMoves(copy);
     possibleMoves.forEach((index) => {
@@ -28,11 +47,11 @@ export const showPossibleMoves = (piece: Piece,board: Square[][]): Square[][] =>
 
     copy[piece.index.y][piece.index.x].focus = true;
 
-    let notValid:Index[] = [];
+    let notValid: Index[] = [];
     const moves = piece.getValidMoves(copy);
-    for(const move of moves){
-        if(!isMoveSafe(piece, move, copy)){
-            notValid.push(move)
+    for (const move of moves) {
+        if (!isMoveSafe(piece, move, copy)) {
+            notValid.push(move);
         }
     }
     copy = removePossibleMove(copy, notValid);
