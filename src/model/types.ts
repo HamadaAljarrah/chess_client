@@ -35,10 +35,14 @@ export interface RemoteMove {
     to: Index;
     player: Color;
     isCheckmate: boolean;
+    channel:string;
+    
 }
 
 export interface RemoteCastle {
-    color: Color, 
-    index: Index, 
-    piece: PieceName 
+    color: Color; 
+    index: Index;
+    piece: PieceName;
+    channel:string,
+
 }

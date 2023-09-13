@@ -5,8 +5,7 @@ import { reducer } from "./reducer";
 import { socket } from "@/model/socket";
 
 export type AppActions =
-    | { type: 'CHOSE_COLOR', payload: { color: Color } }
-    | { type: 'CHOSE_CHANNEL', payload: { channel: string } }
+    | { type: 'START_GAME', payload: { color: Color,channel: string } }
     | { type: 'MOVE_PIECE', payload: { block: Square } }
     | { type: 'PROMOTE_PAWN', payload: { piece: PieceName } }
     | { type: 'SET_BOARD', payload: { board: Square[][] } }
@@ -53,8 +52,7 @@ export interface AppContext {
     movePiece: (block: Square) => void,
     newGame: () => void,
     promotoPawn: (piece: PieceName) => void,
-    choseColor: (color: Color) => void,
-    choseChannel: (channel: string) => void,
+    startGame: (color: Color,channel: string) => void,
     setBoard: (board: Square[][]) => void
     updateGame: (move: RemoteMove) => void
     handleRemoteCastle: (move: RemoteMove) => void
@@ -75,8 +73,7 @@ const AppContextProvider = ({ children }: { children: ReactNode }) => {
     const promotoPawn = (piece: PieceName) => dispatch({ type: "PROMOTE_PAWN", payload: { piece } })
     const updateGame = (move: RemoteMove) => dispatch({ type: "GAME_UPDATE", payload: { move } })
     const handleRemoteCastle = (move: RemoteMove) => dispatch({ type: "HANDLE_REMOTE_CASTLE", payload: { move } })
-    const choseColor = (color: Color) => dispatch({ type: "CHOSE_COLOR", payload: { color } })
-    const choseChannel = (channel: string) => dispatch({ type: "CHOSE_CHANNEL", payload: { channel } })
+    const startGame = (color: Color, channel:string) => dispatch({ type: "START_GAME", payload: { color,channel } })
     const setBoard = (board: Square[][]) => dispatch({ type: "SET_BOARD", payload: { board } })
     const handleRemotePromotion = (data: RemoteCastle) => dispatch({ type: "HANDLE_REMOTE_PROMOTION", payload: { data } })
     const handleRemoteHistory = (data: string) => dispatch({ type: "HANDLE_REMOTE_HISTORY", payload: { data } })
@@ -106,8 +103,7 @@ const AppContextProvider = ({ children }: { children: ReactNode }) => {
             movePiece,
             newGame,
             promotoPawn,
-            choseColor,
-            choseChannel,
+            startGame,
             updateGame,
             handleRemoteCastle,
             handleRemotePromotion,

@@ -16,11 +16,11 @@ import { socket } from "@/model/socket";
 
 export const reducer = (state: AppState, actions: AppActions): AppState => {
     switch (actions.type) {
-        case "CHOSE_COLOR":
-            return { ...state, self: actions.payload.color };
-            
-        case "CHOSE_CHANNEL":            
-            return { ...state, channel: actions.payload.channel };
+  
+
+        case "START_GAME":       
+            socket.emit("startGame", actions.payload) 
+            return { ...state, self: actions.payload.color, channel: actions.payload.channel };
 
         case "SET_BOARD":
             return { ...state, board: actions.payload.board };
@@ -132,12 +132,14 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
                     winner = currentPlayer === "white" ? "Black" : "White";
                 }
 
+                
                 //Broadcast move
                 socket.emit("sendMove", {
                     from: currentBlock.index,
                     to: payloadBlock.index,
                     player: previousPlayer,
                     isCheckmate: winner !== null,
+                    channel: state.channel
                 });
 
                 return {
@@ -171,6 +173,8 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
             };
 
         case "GAME_UPDATE":
+            console.log("getting move");
+            
             const { from, to, player, isCheckmate } = actions.payload.move;
             const board = stimulateMove(from, to, state.board);
             let winner: Winner = null;
