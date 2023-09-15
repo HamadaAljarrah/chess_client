@@ -47,8 +47,6 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
                 return { ...state, currentBlock: null };
             }
 
-
-
             // Ignore empty fields
             if (!payloadBlock.piece && !currentBlock) {
                 return { ...state };
@@ -134,6 +132,7 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
                 // Controll of checkmate
                 let winner: Winner = null;
                 if (getNumOfSafeMove(currentPlayer, board) === 0) {
+                    playSound("checkmate.mp3");
                     winner = currentPlayer === "white" ? "Black" : "White";
                 }
 
@@ -145,8 +144,9 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
 
                 // Check of opponent king in danger
                 const opponentKingInDanger = showCheck(currentPlayer, board);
-                if(opponentKingInDanger){
-                    const {x,y} = opponentKingInDanger;
+                if (opponentKingInDanger) {
+                    playSound("amogus.mp3");
+                    const { x, y } = opponentKingInDanger;
                     board[y][x].danger = true;
                 }
 
@@ -202,7 +202,8 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
             };
 
         case "GAME_UPDATE":
-            const { from, to, player, isCheckmate, checkPos } = actions.payload.move;
+            const { from, to, player, isCheckmate, checkPos } =
+                actions.payload.move;
             let board = stimulateMove(from, to, state.board);
             let winner: Winner = null;
             if (isCheckmate) {
@@ -211,7 +212,8 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
             } else {
                 playSound("move.mp3");
             }
-            if(checkPos){
+            if (checkPos) {
+                playSound("amogus.mp3");
                 board[checkPos.y][checkPos.x].danger = true;
             }
             const currentPlayer = player === "white" ? "black" : "white";

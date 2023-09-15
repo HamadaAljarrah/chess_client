@@ -1,5 +1,5 @@
 import { Color, Index, Square } from "@/model/types";
-import { copyBoard, getKingIndex, isMoveSafe, isSameIndex } from "./game";
+import { copyBoard, getKingIndex, isMoveSafe, isSameIndex, playSound } from "./game";
 import { Piece } from "@/model/pieces/piece";
 import { King } from "@/model/pieces/king";
 
