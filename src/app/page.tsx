@@ -27,6 +27,7 @@ export default function Home() {
     }
     return (
         <div className="flex flex-col gap-4 px-2 items-center pt-20">
+            <img src="./logo.svg" alt="logo" />
             <h1 className="text-slate-700 text-2xl font-semibold uppercase">Choose Color</h1>
             <Select options={OPTIONS} onSelect={(e) => setPlayer(e.value as Color)} />
             <input

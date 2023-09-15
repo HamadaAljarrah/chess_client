@@ -132,7 +132,7 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
                 // Controll of checkmate
                 let winner: Winner = null;
                 if (getNumOfSafeMove(currentPlayer, board) === 0) {
-                    playSound("checkmate.mp3");
+                    playSound("giga-chad.mp3");
                     winner = currentPlayer === "white" ? "Black" : "White";
                 }
 
@@ -202,19 +202,21 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
             };
 
         case "GAME_UPDATE":
+            playSound("move.mp3");
             const { from, to, player, isCheckmate, checkPos } =
                 actions.payload.move;
             let board = stimulateMove(from, to, state.board);
+
             let winner: Winner = null;
             if (isCheckmate) {
                 winner = state.self === "white" ? "Black" : "White";
-                playSound("checkmate.mp3");
-            } else {
-                playSound("move.mp3");
-            }
+                playSound("augh.mp3");
+            } 
             if (checkPos) {
-                playSound("amogus.mp3");
+                playSound("android.mp3");
                 board[checkPos.y][checkPos.x].danger = true;
+            } else {
+                board = clearPossibleMoves(board);
             }
             const currentPlayer = player === "white" ? "black" : "white";
             return {
