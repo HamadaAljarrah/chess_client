@@ -1,13 +1,16 @@
-import { Index, Square } from "@/model/types";
-import { copyBoard, isMoveSafe } from "./game";
+import { Color, Index, Square } from "@/model/types";
+import { copyBoard, getKingIndex, isMoveSafe, isSameIndex } from "./game";
 import { Piece } from "@/model/pieces/piece";
+import { King } from "@/model/pieces/king";
 
 const removePossibleMove = (
     board: Square[][],
     indexes: Index[]
 ): Square[][] => {
     for (const index of indexes) {
+        
         board[index.y][index.x].availibale = false;
+
         board[index.y][index.x].danger = false;
     }
     return board;
@@ -71,8 +74,8 @@ export const clearPossibleMoves = (board: Square[][]): Square[][] => {
             if (copy[y][x].focus) {
                 copy[y][x].focus = false;
             }
-
-            if (copy[y][x].danger) {
+            
+            if (copy[y][x].danger ) {
                 copy[y][x].danger = false;
             }
         }
@@ -80,6 +83,26 @@ export const clearPossibleMoves = (board: Square[][]): Square[][] => {
     return copy;
 };
 
-export const nextChar = (c: string) => {
-    return String.fromCharCode(c.charCodeAt(0) + 1);
+export const showCheck = (color: Color, board: Square[][]) => {
+    const kingPosition = getKingIndex(color, board);
+
+    // Check opponent's pieces for valid moves targeting the king's position
+    const opponentColor = color === "white" ? "black" : "white";
+    for (const row of board) {
+        for (const col of row) {
+            const opponentPiece = col.piece;
+            if (opponentPiece && opponentPiece.color === opponentColor) {
+                const validMoves = opponentPiece.getValidMoves(board);
+                if (
+                    validMoves.some((validMove) =>
+                        isSameIndex(validMove, kingPosition)
+                    )
+                ) {
+                    board[kingPosition.y][kingPosition.x].danger = true;
+                    return kingPosition;
+                }
+            }
+        }
+    }
+    return undefined;
 };

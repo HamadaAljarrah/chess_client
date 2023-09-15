@@ -10,7 +10,7 @@ import {
     countPoints,
 } from "@/helpers/game";
 import { AppActions, AppState } from "./board-context";
-import { clearPossibleMoves, showPossibleMoves } from "@/helpers/ui";
+import { clearPossibleMoves, showCheck, showPossibleMoves } from "@/helpers/ui";
 import { Winner } from "@/model/types";
 import { socket } from "@/model/socket";
 
@@ -46,6 +46,8 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
             ) {
                 return { ...state, currentBlock: null };
             }
+
+
 
             // Ignore empty fields
             if (!payloadBlock.piece && !currentBlock) {
@@ -141,6 +143,13 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
                     to: { x: payloadBlock.index.x, y: payloadBlock.index.y },
                 };
 
+                // Check of opponent king in danger
+                const opponentKingInDanger = showCheck(currentPlayer, board);
+                if(opponentKingInDanger){
+                    const {x,y} = opponentKingInDanger;
+                    board[y][x].danger = true;
+                }
+
                 //Broadcast move and history
                 socket.emit("history", {
                     history: movementHistory,
@@ -151,6 +160,7 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
                     to: payloadBlock.index,
                     player: previousPlayer,
                     isCheckmate: winner !== null,
+                    checkPos: opponentKingInDanger,
                     channel: state.channel,
                 });
                 socket.emit("footprint", {
@@ -192,14 +202,17 @@ export const reducer = (state: AppState, actions: AppActions): AppState => {
             };
 
         case "GAME_UPDATE":
-            const { from, to, player, isCheckmate } = actions.payload.move;
-            const board = stimulateMove(from, to, state.board);
+            const { from, to, player, isCheckmate, checkPos } = actions.payload.move;
+            let board = stimulateMove(from, to, state.board);
             let winner: Winner = null;
             if (isCheckmate) {
                 winner = state.self === "white" ? "Black" : "White";
                 playSound("checkmate.mp3");
             } else {
                 playSound("move.mp3");
+            }
+            if(checkPos){
+                board[checkPos.y][checkPos.x].danger = true;
             }
             const currentPlayer = player === "white" ? "black" : "white";
             return {

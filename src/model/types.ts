@@ -36,6 +36,7 @@ export interface RemoteMove {
     to: Index;
     player: Color;
     isCheckmate: boolean;
+    checkPos?: Index
     channel:string;
     
 }
