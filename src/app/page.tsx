@@ -28,7 +28,9 @@ export default function Home() {
     return (
         <div className="flex flex-col gap-4 px-2 items-center pt-20">
             <img src="./logo.svg" alt="logo" />
-            <h1 className="text-slate-700 text-2xl font-semibold uppercase">Choose Color</h1>
+            <h1 className="text-slate-700 text-2xl font-semibold uppercase">Hamada Chess</h1>
+            <p className="text-slate-700 text-xl   self-start">Choose Color</p>
+
             <Select options={OPTIONS} onSelect={(e) => setPlayer(e.value as Color)} />
             <input
                 className="px-3 w-full h-10 rounded-md flex justify-between items-center cursor-pointer border-[1px] border-black/15"
